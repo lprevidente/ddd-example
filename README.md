@@ -16,6 +16,28 @@ This project showcases a practical implementation of DDD concepts in a Java Spri
 
 - Domain events for cross-aggregate communication
 
+## What the Application Does
+
+This application is a team management system built using Domain-Driven Design (DDD) principles. It allows users to:
+
+Register and manage user accounts with personal information (first name, last name, email)
+Create teams with names
+Add users to teams and remove them from teams
+View team details and team members
+
+The core functionality revolves around managing the relationship between users and teams, implemented via a many-to-many
+relationship through the TeamMember entity.
+
+## Applied Constraints and Design Decisions
+
+### Domain Constraints
+
+- Email Uniqueness: Each email can only be used by one user (enforced via EmailAlreadyInUseException)
+- Password Complexity: Passwords must meet specific strength requirements (length, uppercase, lowercase, digits, special
+  characters)
+- Team Membership: A user cannot be added to the same team twice (enforced in the TeamMember constructor)
+- User and Team IDs: All entities use UUID-based identifiers rather than sequential numeric IDs
+
 ## Architecture
 
 The application is organized around two main bounded contexts:
@@ -155,6 +177,87 @@ domain entities:
 3. **Validation**: Domain-specific validation in entity constructors
 4. **Bounded Contexts**: Clear separation between User and Team domains
 5. **Domain Events**: Using Spring's AbstractAggregateRoot for domain events
+
+## Class Diagram
+
+Here's a simplified class diagram that focuses just on the core domain models and their essential relationships.
+
+```mermaid
+classDiagram
+%% Core Domain Models
+    class User {
+        -UserId id
+        -String firstName
+        -String lastName
+        -Password password
+        -Email email
+    }
+
+    class Team {
+        -TeamId id
+        -String name
+        -LocalDateTime createdAt
+    }
+
+    class TeamMember {
+        -TeamMemberId id
+        -LocalDateTime joinedAt
+        +getTeamId()
+        +getUserId()
+    }
+
+%% Value Objects
+    class UserId {
+        -UUID id
+    }
+
+    class TeamId {
+        -UUID id
+    }
+
+    class TeamMemberId {
+        -TeamId teamId
+        -UserId userId
+    }
+
+    class Email {
+        -String value
+    }
+
+    class Password {
+        -String hashedValue
+        +matches(String plainTextPassword)
+    }
+
+%% Core Services
+    class UserService {
+        +createUser(UserRegistrationDTO)
+    }
+
+    class TeamService {
+        +createTeam(CreateTeam)
+        +deleteTeam(TeamId)
+    }
+
+    class TeamMemberService {
+        +addUserToTeam(AddUserToTeam)
+        +removeUserFromTeam(RemoveUserFromTeam)
+    }
+
+%% Relationships
+    Team "1" *-- "1" TeamId: has
+    User "1" *-- "1" UserId: has
+    TeamMember "1" *-- "1" TeamMemberId: has
+    TeamMemberId "1" *-- "1" TeamId: contains
+    TeamMemberId "1" *-- "1" UserId: contains
+    User "1" *-- "1" Email: has
+    User "1" *-- "1" Password: has
+    Team "1" -- "*" TeamMember: has
+    User "1" -- "*" TeamMember: belongs to
+    UserService --> User: manages
+    TeamService --> Team: manages
+    TeamMemberService --> TeamMember: manages
+```
 
 ## Future Enhancements
 
