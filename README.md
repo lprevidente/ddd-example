@@ -13,8 +13,8 @@ This project showcases a practical implementation of DDD concepts in a Java Spri
 - Clear domain boundaries and aggregates
 - Modular application structure
 - Rich domain models with business logic
-
 - Domain events for cross-aggregate communication
+- CQRS pattern for separating read and write operations
 
 ## What the Application Does
 
@@ -53,7 +53,6 @@ for cross-domain interactions.
 - Java 21
 - Spring Boot 3.x
 - Spring Data JPA
-- Blaze-Persistence for efficient querying and entity views
 - Spring Modulith for enforcing modular architecture
 - H2 in-memory database for simplicity
 - Lombok for reducing boilerplate code
@@ -72,10 +71,13 @@ for cross-domain interactions.
 - `Password` - Handles password hashing and validation
 - `UserId` and `TeamId` - Strongly typed identifiers
 
-### Domain Services
+### Command Handlers (CQRS)
 
-- `TeamService` - Core business logic for team operations
-- `UserService` - Manages user operations
+The application follows the Command Query Responsibility Segregation pattern:
+
+- Each command (e.g., `CreateTeam`, `AddUserToTeam`) has a dedicated handler
+- Commands represent intent to change state
+- Queries are separated from commands for optimized read operations
 
 ### Application Services
 
@@ -96,11 +98,14 @@ Each aggregate has its dedicated repository with domain-specific method signatur
 - `GET /api/users` - List all users
 - `GET /api/users/{id}` - Get user details
 - `POST /api/users` - Register a new user
+- `PUT /api/users/{id}` - Update user information
 
 ### Team Management
 
 - `GET /api/teams` - List all teams
+- `GET /api/teams/{id}` - Get team details
 - `POST /api/teams` - Create a new team
+- `PUT /api/teams/{id}` - Update team information
 - `DELETE /api/teams/{id}` - Delete a team
 
 ### Team Membership
@@ -108,6 +113,7 @@ Each aggregate has its dedicated repository with domain-specific method signatur
 - `GET /api/teams/{teamId}/members` - List team members
 - `POST /api/teams/{teamId}/members` - Add user to team
 - `DELETE /api/teams/{teamId}/members/{userId}` - Remove user from team
+- `GET /api/users/{userId}/teams` - List teams for a user
 
 ## Running the Application
 
@@ -159,17 +165,6 @@ TeamMember
  |-- JoinedAt
 ```
 
-## Advanced Features
-
-### Entity Views with Blaze-Persistence
-
-The application demonstrates the use of Blaze-Persistence entity views to efficiently fetch read-only projections of
-domain entities:
-
-- `TeamView` - Read-only projection of Team data
-- `UserView` - Read-only projection of User data
-- `MemberInfoView` - User projection specific to team membership
-
 ## Design Decisions
 
 1. **Explicit Value Objects**: Using record types for immutable value objects
@@ -177,10 +172,11 @@ domain entities:
 3. **Validation**: Domain-specific validation in entity constructors
 4. **Bounded Contexts**: Clear separation between User and Team domains
 5. **Domain Events**: Using Spring's AbstractAggregateRoot for domain events
+6. **CQRS Pattern**: Separate command and query responsibilities for better scalability and maintainability
 
 ## Class Diagram
 
-Here's a simplified class diagram that focuses just on the core domain models and their essential relationships.
+Here's a simplified class diagram that focuses on the core domain models and the CQRS pattern implementation.
 
 ```mermaid
 classDiagram
@@ -229,19 +225,42 @@ classDiagram
         +matches(String plainTextPassword)
     }
 
-%% Core Services
-    class UserService {
-        +createUser(UserRegistrationDTO)
+%% CQRS Commands and Handlers
+    class CreateUserCommand {
+        -String firstName
+        -String lastName
+        -String email
+        -String password
     }
 
-    class TeamService {
-        +createTeam(CreateTeam)
-        +deleteTeam(TeamId)
+    class CreateTeamCommand {
+        -String name
     }
 
-    class TeamMemberService {
-        +addUserToTeam(AddUserToTeam)
-        +removeUserFromTeam(RemoveUserFromTeam)
+    class AddUserToTeamCommand {
+        -TeamId teamId
+        -UserId userId
+    }
+
+    class RemoveUserFromTeamCommand {
+        -TeamId teamId
+        -UserId userId
+    }
+
+    class CreateUserCommandHandler {
+        +handle(CreateUserCommand)
+    }
+
+    class CreateTeamCommandHandler {
+        +handle(CreateTeamCommand)
+    }
+
+    class AddUserToTeamCommandHandler {
+        +handle(AddUserToTeamCommand)
+    }
+
+    class RemoveUserFromTeamCommandHandler {
+        +handle(RemoveUserFromTeamCommand)
     }
 
 %% Relationships
@@ -254,9 +273,16 @@ classDiagram
     User "1" *-- "1" Password: has
     Team "1" -- "*" TeamMember: has
     User "1" -- "*" TeamMember: belongs to
-    UserService --> User: manages
-    TeamService --> Team: manages
-    TeamMemberService --> TeamMember: manages
+    
+    CreateUserCommandHandler ..> User: creates
+    CreateTeamCommandHandler ..> Team: creates
+    AddUserToTeamCommandHandler ..> TeamMember: creates
+    RemoveUserFromTeamCommandHandler ..> TeamMember: removes
+    
+    CreateUserCommand --> CreateUserCommandHandler: handled by
+    CreateTeamCommand --> CreateTeamCommandHandler: handled by
+    AddUserToTeamCommand --> AddUserToTeamCommandHandler: handled by
+    RemoveUserFromTeamCommand --> RemoveUserFromTeamCommandHandler: handled by
 ```
 
 ## Future Enhancements
@@ -264,7 +290,6 @@ classDiagram
 - Add authentication and authorization
 - Implement more sophisticated domain events
 - Add more complex business rules
-- Enhance error handling and validation
 
 ## Learning & Contributions
 
