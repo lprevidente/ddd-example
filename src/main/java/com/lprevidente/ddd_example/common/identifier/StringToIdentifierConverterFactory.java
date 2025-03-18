@@ -9,7 +9,7 @@ import org.springframework.core.convert.converter.Converter;
 import org.springframework.core.convert.converter.ConverterFactory;
 
 @Slf4j
-final class StringToIdentifierConverterFactory<T extends Identifier>
+class StringToIdentifierConverterFactory<T extends Identifier>
     implements ConverterFactory<String, T> {
 
   @Override

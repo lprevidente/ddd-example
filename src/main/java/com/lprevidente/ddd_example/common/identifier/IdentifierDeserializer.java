@@ -10,7 +10,7 @@ import java.util.UUID;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor
-public class IdentifierDeserializer extends JsonDeserializer<Object>
+class IdentifierDeserializer extends JsonDeserializer<Object>
     implements ContextualDeserializer {
 
   private Class<?> targetClass;

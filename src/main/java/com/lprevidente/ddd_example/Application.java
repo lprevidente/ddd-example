@@ -5,9 +5,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 
 @SpringBootApplication(exclude = {UserDetailsServiceAutoConfiguration.class})
-public class DddExampleApplication {
+public class Application {
 
   public static void main(String[] args) {
-    SpringApplication.run(DddExampleApplication.class, args);
+    SpringApplication.run(Application.class, args);
   }
 }

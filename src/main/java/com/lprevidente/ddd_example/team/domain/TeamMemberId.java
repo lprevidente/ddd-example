@@ -10,8 +10,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 /** Composite ID for TeamMembership consisting of teamId and userId */
-@Embeddable
 @Getter
+@Embeddable
 @NoArgsConstructor
 public class TeamMemberId implements Serializable {
 

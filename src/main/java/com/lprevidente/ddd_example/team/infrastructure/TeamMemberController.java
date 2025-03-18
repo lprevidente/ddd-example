@@ -9,7 +9,6 @@ import com.lprevidente.ddd_example.team.domain.TeamId;
 import com.lprevidente.ddd_example.team.domain.UserId;
 import jakarta.validation.Valid;
 import java.util.Collection;
-
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/teams/{teamId}/members")
 @RequiredArgsConstructor
-public class TeamMemberController {
+class TeamMemberController {
 
   private final Pipeline pipeline;
   private final TeamMemberQueryService teamMemberQueryService;

@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AddUserHandler implements Command.Handler<AddUser, UserId> {
+class AddUserHandler implements Command.Handler<AddUser, UserId> {
 
   private final Users users;
 

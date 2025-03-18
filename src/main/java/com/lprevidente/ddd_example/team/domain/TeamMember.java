@@ -4,23 +4,27 @@ import com.lprevidente.ddd_example.user.api.UserApi;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
+import lombok.AccessLevel;
 import lombok.Getter;
-import org.springframework.data.domain.AbstractAggregateRoot;
+import lombok.NoArgsConstructor;
 import org.springframework.util.Assert;
 
 @Getter
 @Entity
 @Table(name = "team_members")
-public class TeamMember extends AbstractAggregateRoot<TeamMember> {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class TeamMember {
 
   @EmbeddedId private TeamMemberId id;
 
   private LocalDateTime joinedAt;
 
-  protected TeamMember() {}
-
   public TeamMember(
-      TeamId teamId, UserId userId, Teams teams, UserApi users, TeamMembers teamMembers) {
+      TeamId teamId, //
+      UserId userId,
+      Teams teams,
+      UserApi users,
+      TeamMembers teamMembers) {
     Assert.notNull(teamId, "teamId must not be null");
     Assert.notNull(userId, "userId must not be null");
 

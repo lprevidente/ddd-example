@@ -3,7 +3,7 @@ package com.lprevidente.ddd_example.pipeline;
 import com.lprevidente.ddd_example.exception.DomainException;
 import org.springframework.http.HttpStatus;
 
-public class CommandHandlerNotFoundException extends DomainException {
+class CommandHandlerNotFoundException extends DomainException {
 
   @SuppressWarnings("rawtypes")
   public CommandHandlerNotFoundException(Command command) {

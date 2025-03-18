@@ -13,7 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 
 @Slf4j
 @RestControllerAdvice
-public class GlobalExceptionHandler {
+class GlobalExceptionHandler {
 
   @ExceptionHandler(NoSuchElementException.class)
   public ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {

@@ -6,11 +6,11 @@ import com.lprevidente.ddd_example.team.domain.Team;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import com.lprevidente.ddd_example.team.domain.Teams;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class CreateTeamHandler implements Command.Handler<CreateTeam, TeamId> {
+class CreateTeamHandler implements Command.Handler<CreateTeam, TeamId> {
   private final Teams teams;
 
   @Override

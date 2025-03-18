@@ -2,7 +2,7 @@ package com.lprevidente.ddd_example.pipeline;
 
 import java.util.stream.Stream;
 
-public interface CommandHandlers {
+interface CommandHandlers {
 
   Stream<Command.Handler> supply();
 }

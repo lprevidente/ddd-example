@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/api/v1/teams")
 @RequiredArgsConstructor
-public class TeamController {
+class TeamController {
 
   private final Pipeline pipeline;
   private final TeamQueryService teamQueryService;

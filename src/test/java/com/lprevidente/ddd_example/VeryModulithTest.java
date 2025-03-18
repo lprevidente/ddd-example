@@ -9,7 +9,7 @@ class VeryModulithTest {
 
   @Test
   void createApplicationModuleModel() {
-    ApplicationModules modules = ApplicationModules.of(DddExampleApplication.class);
+    ApplicationModules modules = ApplicationModules.of(Application.class);
     modules.forEach(System.out::println);
     modules.verify();
   }

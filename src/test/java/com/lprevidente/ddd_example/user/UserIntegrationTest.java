@@ -24,8 +24,10 @@ import org.springframework.test.web.servlet.MockMvc;
 @Sql(value = "/users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class UserIntegrationTest {
 
-  private static final UUID EXISTING_USER_ID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
-  private static final UUID NON_EXISTENT_USER_ID_UUID = UUID.fromString("99999999-9999-9999-9999-999999999999");
+  private static final UUID EXISTING_USER_ID_UUID =
+      UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final UUID NON_EXISTENT_USER_ID_UUID =
+      UUID.fromString("99999999-9999-9999-9999-999999999999");
 
   private static final UserId EXISTING_USER_ID = new UserId(EXISTING_USER_ID_UUID);
   private static final UserId NON_EXISTENT_USER_ID = new UserId(NON_EXISTENT_USER_ID_UUID);

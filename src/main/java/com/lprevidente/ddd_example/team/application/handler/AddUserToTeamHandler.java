@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AddUserToTeamHandler implements Command.Handler<AddUserToTeam, Void> {
+class AddUserToTeamHandler implements Command.Handler<AddUserToTeam, Void> {
   private final TeamMembers teamMembers;
   private final UserApi users;
   private final Teams teams;

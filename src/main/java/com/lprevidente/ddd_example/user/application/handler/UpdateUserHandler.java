@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Component
 @RequiredArgsConstructor
-public class UpdateUserHandler implements Command.Handler<UpdateUser, Void> {
+class UpdateUserHandler implements Command.Handler<UpdateUser, Void> {
 
   private final Users users;
 

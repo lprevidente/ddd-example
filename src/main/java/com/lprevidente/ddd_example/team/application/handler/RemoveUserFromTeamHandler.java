@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class RemoveUserFromTeamHandler implements Command.Handler<RemoveUserFromTeam, Void> {
+class RemoveUserFromTeamHandler implements Command.Handler<RemoveUserFromTeam, Void> {
   private final TeamMembers teamMembers;
 
   @Override

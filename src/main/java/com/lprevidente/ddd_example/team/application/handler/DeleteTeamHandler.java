@@ -5,11 +5,11 @@ import com.lprevidente.ddd_example.team.application.command.DeleteTeam;
 import com.lprevidente.ddd_example.team.domain.Teams;
 import com.lprevidente.ddd_example.team.domain.exception.TeamNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 
-@Service
+@Component
 @RequiredArgsConstructor
-public class DeleteTeamHandler implements Command.Handler<DeleteTeam, Void> {
+class DeleteTeamHandler implements Command.Handler<DeleteTeam, Void> {
   private final Teams teams;
 
   @Override

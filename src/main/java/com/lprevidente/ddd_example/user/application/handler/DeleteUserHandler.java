@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class DeleteUserHandler implements Command.Handler<DeleteUser, Void> {
+class DeleteUserHandler implements Command.Handler<DeleteUser, Void> {
 
   private final Users users;
 

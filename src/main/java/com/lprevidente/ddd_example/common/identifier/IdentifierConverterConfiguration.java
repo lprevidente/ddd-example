@@ -5,7 +5,7 @@ import org.springframework.format.FormatterRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-public class IdentifierConverterConfiguration implements WebMvcConfigurer {
+class IdentifierConverterConfiguration implements WebMvcConfigurer {
 
   @Override
   public void addFormatters(FormatterRegistry registry) {
