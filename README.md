@@ -1,5 +1,7 @@
 # DDD Example Application
 
+[![Run Tests](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml/badge.svg)](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml)
+
 A Spring Boot application demonstrating Domain-Driven Design (DDD) principles with a focus on clean architecture,
 modularity, and separation of concerns.
 
@@ -273,12 +275,10 @@ classDiagram
     User "1" *-- "1" Password: has
     Team "1" -- "*" TeamMember: has
     User "1" -- "*" TeamMember: belongs to
-    
     CreateUserCommandHandler ..> User: creates
     CreateTeamCommandHandler ..> Team: creates
     AddUserToTeamCommandHandler ..> TeamMember: creates
     RemoveUserFromTeamCommandHandler ..> TeamMember: removes
-    
     CreateUserCommand --> CreateUserCommandHandler: handled by
     CreateTeamCommand --> CreateTeamCommandHandler: handled by
     AddUserToTeamCommand --> AddUserToTeamCommandHandler: handled by
