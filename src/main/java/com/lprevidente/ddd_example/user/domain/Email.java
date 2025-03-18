@@ -8,4 +8,9 @@ public record Email(String value) {
     Assert.notNull(value, "hashedValue must not be null");
     Assert.isTrue(value.matches("^[A-Za-z0-9+_.-]+@(.+)$"), "The hashedValue is not a valid");
   }
+
+  @Override
+  public String toString() {
+    return value;
+  }
 }

@@ -1,6 +1,9 @@
 package com.lprevidente.ddd_example.team.application.command;
 
+import com.lprevidente.ddd_example.pipeline.Command;
+import com.lprevidente.ddd_example.team.domain.TeamId;
+import com.lprevidente.ddd_example.team.domain.UserId;
 import jakarta.validation.constraints.NotNull;
-import java.util.UUID;
 
-public record RemoveUserFromTeam(@NotNull UUID teamId, @NotNull UUID userId) {}
+public record RemoveUserFromTeam(@NotNull TeamId teamId, @NotNull UserId userId)
+    implements Command<Void> {}

@@ -1,5 +1,6 @@
 package com.lprevidente.ddd_example.team.domain;
 
+import com.lprevidente.ddd_example.user.api.UserApi;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -18,13 +19,17 @@ public class TeamMember extends AbstractAggregateRoot<TeamMember> {
 
   protected TeamMember() {}
 
-  public TeamMember(TeamId teamId, UserId userId, TeamMemberRepository repository) {
+  public TeamMember(
+      TeamId teamId, UserId userId, Teams teams, UserApi users, TeamMembers teamMembers) {
     Assert.notNull(teamId, "teamId must not be null");
     Assert.notNull(userId, "userId must not be null");
 
+    Assert.isTrue(teams.existsById(teamId), "team does not exist");
+    Assert.isTrue(users.existsById(userId.id()), "user does not exist");
+
     this.id = new TeamMemberId(teamId, userId);
 
-    Assert.isTrue(!repository.existsById(id), "User is already a member of this team");
+    Assert.isTrue(!teamMembers.existsById(id), "User is already a member of this team");
 
     this.joinedAt = LocalDateTime.now();
   }

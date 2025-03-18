@@ -1,22 +1,25 @@
 package com.lprevidente.ddd_example.user.application;
 
-import com.lprevidente.ddd_example.user.domain.UserRepository;
-import com.lprevidente.ddd_example.user.infrastructure.persistence.UserView;
-import java.util.List;
-import java.util.UUID;
+import com.lprevidente.ddd_example.user.application.dto.UserInfoDto;
+import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.domain.Users;
+import com.lprevidente.ddd_example.user.domain.exception.UserNotFoundException;
+import java.util.Collection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
 public class UserQueryService {
-  private final UserRepository userRepository;
+  private final Users users;
 
-  public List<UserView> findAll() {
-    return userRepository.fetchAll(UserView.class);
+  public Collection<UserInfoDto> findAll() {
+    return users.findAllBy(UserInfoDto.class);
   }
 
-  public UserView getUserById(UUID id) {
-    return userRepository.fetchById(id, UserView.class).orElseThrow();
+  public UserInfoDto getUserById(UserId userId) {
+    return users
+        .findById(userId, UserInfoDto.class)
+        .orElseThrow(() -> new UserNotFoundException(userId));
   }
 }

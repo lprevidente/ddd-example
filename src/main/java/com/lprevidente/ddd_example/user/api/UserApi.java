@@ -7,7 +7,9 @@ import java.util.UUID;
 
 public interface UserApi {
 
-  <T extends BaseInfoView> Optional<T> findById(UUID id, Class<T> clazz);
+  boolean existsById(UUID id);
 
-  <T extends BaseInfoView> Map<UUID, T> findAllById(Collection<UUID> ids, Class<T> clazz);
+  <T> Optional<T> findById(UUID id, Class<T> clazz);
+
+  <T extends UserIdDto> Map<UUID, T> findAllById(Collection<UUID> ids, Class<T> clazz);
 }

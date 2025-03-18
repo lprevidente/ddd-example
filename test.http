@@ -1,5 +1,19 @@
 ### GET request to example server
-GET http://127.0.0.1:8080/api/users
+GET http://127.0.0.1:8080/api/v1/users
+
+### POSt request to example server
+POST http://127.0.0.1:8080/api/v1/users
+Content-Type: application/json
+
+{
+  "firstName": "Hello",
+  "lastName": "Bello",
+  "password": "be@243Fga",
+  "email": "email@email.com"
+}
+
+### GET request to example server
+GET http://127.0.0.1:8080/api/v1/users/f47ac10b-58cc-4372-a567-0e02b2c3d479
 
 ### GET teams
 GET http://127.0.0.1:8080/api/teams
