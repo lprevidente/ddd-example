@@ -9,12 +9,22 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig {
+public class SecurityConfig {
 
   @Bean
-  SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
-    return http.csrf(AbstractHttpConfigurer::disable)
-        .authorizeHttpRequests(d -> d.anyRequest().permitAll())
-        .build();
+  public SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+    http
+      // Desabilita CSRF (você já tinha)
+      .csrf(AbstractHttpConfigurer::disable)
+      // Permite que o console H2 carregue seus frames
+      .headers(headers -> headers
+        .frameOptions(frame -> frame.disable())
+      )
+      // Autoriza todas as requisições (inclui /h2-console)
+      .authorizeHttpRequests(auth -> auth
+        .anyRequest().permitAll()
+      );
+
+    return http.build();
   }
 }
