@@ -1,6 +1,5 @@
 package com.lprevidente.ddd_example.team.domain;
 
-import com.lprevidente.ddd_example.user.api.UserApi;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -12,48 +11,42 @@ import org.springframework.util.Assert;
 @Getter
 @Entity
 @Table(name = "team_members")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)          // JPA
 public class TeamMember {
 
-  @EmbeddedId private TeamMemberId id;
+  @EmbeddedId
+  private TeamMemberId id;
 
-  private LocalDateTime joinedAt;
+  @Column(nullable = false, updatable = false)             // imutável
+  private final LocalDateTime joinedAt = LocalDateTime.now();
 
-  public TeamMember(
-      TeamId teamId, //
-      UserId userId,
-      Teams teams,
-      UserApi users,
-      TeamMembers teamMembers) {
-    Assert.notNull(teamId, "teamId must not be null");
-    Assert.notNull(userId, "userId must not be null");
-
-    Assert.isTrue(teams.existsById(teamId), "team does not exist");
-    Assert.isTrue(users.existsById(userId.id()), "user does not exist");
-
-    this.id = new TeamMemberId(teamId, userId);
-
-    Assert.isTrue(!teamMembers.existsById(id), "User is already a member of this team");
-
-    this.joinedAt = LocalDateTime.now();
+  /* ---------- Fábrica estática ---------- */
+  public static TeamMember of(TeamId teamId, UserId userId) {
+    return new TeamMember(teamId, userId);
   }
 
-  public TeamId getTeamId() {
-    return id.getTeamId();
+  /* ---------- Construtor privado ---------- */
+  private TeamMember(TeamId teamId, UserId userId) {
+    setIds(teamId, userId);                                // validação única
   }
 
-  public UserId getUserId() {
-    return id.getUserId();
-  }
+  /* ---------- Comportamento utilitário ---------- */
+  public TeamId teamId()   { return id.getTeamId(); }
+  public UserId userId()   { return id.getUserId(); }
 
+  /* ---------- Igualdade baseada no identificador ---------- */
   @Override
   public final boolean equals(Object o) {
-    if (!(o instanceof TeamMember that)) return false;
-    return Objects.equals(id, that.id);
+    return o instanceof TeamMember that && Objects.equals(id, that.id);
   }
 
   @Override
-  public int hashCode() {
-    return Objects.hashCode(id);
+  public int hashCode() { return Objects.hashCode(id); }
+
+  /* ---------- Validação interna ---------- */
+  private void setIds(TeamId teamId, UserId userId) {
+    Assert.notNull(teamId, "teamId must not be null");
+    Assert.notNull(userId, "userId must not be null");
+    this.id = new TeamMemberId(teamId, userId);
   }
 }

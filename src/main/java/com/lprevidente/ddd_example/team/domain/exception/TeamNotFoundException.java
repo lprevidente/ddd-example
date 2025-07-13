@@ -4,7 +4,7 @@ import com.lprevidente.ddd_example.exception.DomainException;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import org.springframework.http.HttpStatus;
 
-/** Exception thrown when a user cannot be found. */
+/** Exception thrown when a team cannot be found. */
 public class TeamNotFoundException extends DomainException {
 
   public TeamNotFoundException(TeamId teamId) {

@@ -1,57 +1,76 @@
 package com.lprevidente.ddd_example.user.domain;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.util.regex.Pattern;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.Assert;
 
-public record Password(String hashedValue) {
+/**
+ * Value Object imutável que encapsula senhas B-Crypt.
+ *
+ * <p>▪ Use {@link #create(String)} para gerar nova senha.<br>
+ * ▪ Use {@link #fromHashed(String)} para reconstruir senha já persistida.</p>
+ */
+@Embeddable                                // JPA reconhece como objeto incorporável
+public final class Password {
 
-  // Compact constructor for validation
-  public Password {
-    Assert.hasText(hashedValue, "Hashed password cannot be empty");
+  /* ---------- Configuração da política ---------- */
+  private static final int MIN_LENGTH = 8;
+  private static final Pattern UPPER_PATTERN   = Pattern.compile("[A-Z]");
+  private static final Pattern LOWER_PATTERN   = Pattern.compile("[a-z]");
+  private static final Pattern DIGIT_PATTERN   = Pattern.compile("\\d");
+  private static final Pattern SPECIAL_PATTERN =
+      Pattern.compile("[!@#$%^&*(),.?\":{}|<>]");
+
+  /* ---------- Estado ---------- */
+  @Column(name = "hash", nullable = false, length = 255)
+  private String hash;                       // nunca exposto publicamente
+
+  /** Construtor exigido pelo JPA (proteção default). */
+  protected Password() {}
+
+  private Password(String hash) {
+    Assert.hasText(hash, "Hashed password cannot be empty");
+    this.hash = hash;
   }
 
-  // Factory method for creating new passwords
-  public static Password create(String plainTextPassword) {
-    validatePasswordStrength(plainTextPassword);
-    String hashedPassword = hashPassword(plainTextPassword);
-    return new Password(hashedPassword);
+  /* ---------- Fábricas ---------- */
+  public static Password create(String plainText) {
+    validateStrength(plainText);
+    return new Password(hash(plainText));
   }
 
-  /* Factory method for reconstituting from persistence */
-  public static Password fromHashed(String hashedPassword) {
-    return new Password(hashedPassword);
+  public static Password fromHashed(String existingHash) {
+    return new Password(existingHash);
   }
 
-  private static void validatePasswordStrength(String password) {
-    Assert.hasText(password, "Password cannot be empty");
-    Assert.isTrue(password.length() >= 8, "Password must be at least 8 characters long");
+  /* ---------- Domínio ---------- */
+  public boolean matches(String plainText) {
+    Assert.hasText(plainText, "Plain text password cannot be empty");
+    return BCrypt.checkpw(plainText, hash);
+  }
 
-    // Check for complexity requirements
-    boolean hasUppercase = Pattern.compile("[A-Z]").matcher(password).find();
-    boolean hasLowercase = Pattern.compile("[a-z]").matcher(password).find();
-    boolean hasDigit = Pattern.compile("\\d").matcher(password).find();
-    boolean hasSpecialChar = Pattern.compile("[!@#$%^&*(),.?\":{}|<>]").matcher(password).find();
+  /* ---------- Utilitário ---------- */
+  @Override public String toString() { return "Password[hash=*****]"; }
+
+  /* package */ String value() { return hash; }   // acesso restrito a persistência
+
+  /* ---------- Internos ---------- */
+  private static void validateStrength(String pwd) {
+    Assert.hasText(pwd, "Password cannot be empty");
+    Assert.isTrue(pwd.length() >= MIN_LENGTH,
+        "Password must be at least %d characters long".formatted(MIN_LENGTH));
 
     Assert.isTrue(
-        hasUppercase && hasLowercase && hasDigit && hasSpecialChar,
-        "Password must contain at least one uppercase letter, one lowercase letter, "
-            + "one digit, and one special character");
+        UPPER_PATTERN.matcher(pwd).find() &&
+        LOWER_PATTERN.matcher(pwd).find() &&
+        DIGIT_PATTERN.matcher(pwd).find() &&
+        SPECIAL_PATTERN.matcher(pwd).find(),
+        "Password must contain uppercase, lowercase, digit and special character");
   }
 
-  private static String hashPassword(String plainTextPassword) {
-    return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(12));
-  }
-
-  // Verify if a plain text password matches this password
-  public boolean matches(String plainTextPassword) {
-    Assert.hasText(plainTextPassword, "Plain text password cannot be empty");
-    return BCrypt.checkpw(plainTextPassword, this.hashedValue());
-  }
-
-  // Override toString to avoid exposing hash in logs
-  @Override
-  public String toString() {
-    return "Password[hashedValue=*****]";
+  private static String hash(String plainText) {
+    return BCrypt.hashpw(plainText, BCrypt.gensalt(12));
   }
 }
