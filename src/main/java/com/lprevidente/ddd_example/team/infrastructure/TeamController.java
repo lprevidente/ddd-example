@@ -21,19 +21,19 @@ class TeamController {
   private final TeamQueryService teamQueryService;
 
   @GetMapping
-  public Collection<TeamInfoDto> getTeams() {
+  Collection<TeamInfoDto> getTeams() {
     return teamQueryService.getTeams();
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public TeamId createTeam(@RequestBody @Valid CreateTeam command) {
+  TeamId createTeam(@RequestBody @Valid CreateTeam command) {
     return pipeline.send(command);
   }
 
   @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteTeam(@PathVariable @Valid TeamId id) {
+  void deleteTeam(@PathVariable @Valid TeamId id) {
     pipeline.send(new DeleteTeam(id));
   }
 }

@@ -4,25 +4,24 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lprevidente.ddd_example.BaseIntegrationTest;
 import com.lprevidente.ddd_example.team.application.command.AddUserToTeam;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.json.JsonMapper;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @Sql(
     value = {"/users.sql", "/team.sql", "/team_members.sql"},
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-class TeamMemberIntegrationTest {
+class TeamMemberIntegrationTest extends BaseIntegrationTest {
 
   private static final UUID EXISTING_TEAM_ID_UUID =
       UUID.fromString("44444444-4444-4444-4444-444444444444");
@@ -36,9 +35,6 @@ class TeamMemberIntegrationTest {
       UUID.fromString("33333333-3333-3333-3333-333333333333");
   private static final UUID NON_EXISTENT_USER_ID_UUID =
       UUID.fromString("88888888-8888-8888-8888-888888888888");
-
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   @Nested
   @DisplayName("GET /api/teams/{teamId}/members")
@@ -85,7 +81,7 @@ class TeamMemberIntegrationTest {
           .perform(
               post("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID)
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUserToTeam)))
+                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
           .andExpect(status().isCreated());
 
       // Verify user is now in the team
@@ -104,7 +100,7 @@ class TeamMemberIntegrationTest {
           .perform(
               post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUserToTeam)))
+                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
           .andExpect(status().isBadRequest());
     }
 
@@ -154,7 +150,7 @@ class TeamMemberIntegrationTest {
           .perform(
               post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUserToTeam)))
+                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
           .andExpect(status().isBadRequest());
     }
 
@@ -167,7 +163,7 @@ class TeamMemberIntegrationTest {
           .perform(
               post("/api/teams/{teamId}/members", NON_EXISTENT_TEAM_ID_UUID)
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUserToTeam)))
+                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
           .andExpect(status().isBadRequest());
     }
   }

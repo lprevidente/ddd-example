@@ -1,16 +1,19 @@
 package com.lprevidente.ddd_example.common.identifier;
 
-import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.JsonSerializer;
-import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonGenerator;
+import tools.jackson.databind.SerializationContext;
+import tools.jackson.databind.ValueSerializer;
 
-class IdentifierSerializer extends JsonSerializer<Identifier> {
+class IdentifierSerializer extends ValueSerializer<Identifier> {
 
   @Override
   public void serialize(
-      Identifier identifier, JsonGenerator jsonGenerator, SerializerProvider serializerProvider)
-      throws IOException {
+      Identifier identifier, //
+      JsonGenerator jsonGenerator,
+      SerializationContext ctxt)
+      throws JacksonException {
 
     if (identifier == null) {
       jsonGenerator.writeNull();

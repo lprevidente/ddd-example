@@ -21,30 +21,30 @@ class UserController {
   private final UserQueryService userQueryService;
 
   @GetMapping
-  public Collection<UserInfoDto> getUsers() {
+  Collection<UserInfoDto> getUsers() {
     return userQueryService.findAll();
   }
 
   @GetMapping("{id}")
-  public UserInfoDto getUser(@PathVariable UserId id) {
+  UserInfoDto getUser(@PathVariable UserId id) {
     return userQueryService.getUserById(id);
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public UserId createUser(@RequestBody @Valid AddUser dto) {
+  UserId createUser(@RequestBody @Valid AddUser dto) {
     return pipeline.send(dto);
   }
 
   @PutMapping
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void updateUser(@RequestBody @Valid UpdateUser dto) {
+  void updateUser(@RequestBody @Valid UpdateUser dto) {
     pipeline.send(dto);
   }
 
   @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void deleteUser(@PathVariable UserId id) {
+  void deleteUser(@PathVariable UserId id) {
     pipeline.send(new DeleteUser(id));
   }
 }

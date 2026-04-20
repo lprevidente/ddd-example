@@ -52,11 +52,13 @@ for cross-domain interactions.
 
 ## Technology Stack
 
-- Java 21
-- Spring Boot 3.x
+- Java 25
+- Spring Boot 4.0.5
 - Spring Data JPA
-- Spring Modulith for enforcing modular architecture
-- H2 in-memory database for simplicity
+- Spring Security
+- Spring Modulith 2.0.5 for enforcing modular architecture
+- PostgreSQL (via Docker Compose)
+- H2 in-memory database for tests
 - Lombok for reducing boilerplate code
 
 ## Key DDD Concepts Demonstrated
@@ -121,8 +123,9 @@ Each aggregate has its dedicated repository with domain-specific method signatur
 
 ### Prerequisites
 
-- Java 21
+- Java 25
 - Maven
+- Docker (for PostgreSQL via Docker Compose)
 
 ### Setup
 
@@ -132,7 +135,7 @@ Each aggregate has its dedicated repository with domain-specific method signatur
    cd ddd-example
    ```
 
-2. No database configuration needed (using H2 in-memory database)
+2. Start the database (Docker must be running — Spring Boot will start PostgreSQL automatically via Docker Compose)
 
 3. Build and run the application:
    ```

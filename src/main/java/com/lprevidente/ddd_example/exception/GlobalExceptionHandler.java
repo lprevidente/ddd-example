@@ -16,7 +16,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 class GlobalExceptionHandler {
 
   @ExceptionHandler(NoSuchElementException.class)
-  public ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {
+  ProblemDetail handleNoSuchElementException(NoSuchElementException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
     problemDetail.setTitle("Resource Not Found");
@@ -24,7 +24,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(DomainException.class)
-  public ProblemDetail handleDomainException(DomainException ex) {
+  ProblemDetail handleDomainException(DomainException ex) {
     final var problemDetail = ProblemDetail.forStatusAndDetail(ex.getStatus(), ex.getMessage());
     problemDetail.setTitle(ex.getTitle());
     problemDetail.setProperty("errorCode", ex.getErrorCode());
@@ -32,7 +32,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(IllegalArgumentException.class)
-  public ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {
+  ProblemDetail handleIllegalArgumentException(IllegalArgumentException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
     problemDetail.setTitle("Invalid Request");
@@ -40,7 +40,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(HttpMessageNotReadableException.class)
-  public ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
+  ProblemDetail handleHttpMessageNotReadableException(HttpMessageNotReadableException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Malformed JSON request");
     problemDetail.setTitle("Invalid JSON");
@@ -48,7 +48,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentNotValidException.class)
-  public ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+  ProblemDetail handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Validation failed");
     problemDetail.setTitle("Validation Error");
@@ -64,7 +64,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(ConstraintViolationException.class)
-  public ProblemDetail handleConstraintViolationException(ConstraintViolationException ex) {
+  ProblemDetail handleConstraintViolationException(ConstraintViolationException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, "Constraint violation");
     problemDetail.setTitle("Validation Error");
@@ -88,8 +88,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(MethodArgumentTypeMismatchException.class)
-  public ProblemDetail handleMethodArgumentTypeMismatchException(
-      MethodArgumentTypeMismatchException ex) {
+  ProblemDetail handleMethodArgumentTypeMismatchException(MethodArgumentTypeMismatchException ex) {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(
             HttpStatus.BAD_REQUEST,
@@ -101,7 +100,7 @@ class GlobalExceptionHandler {
   }
 
   @ExceptionHandler(Exception.class)
-  public ProblemDetail handleGenericException(Exception ex) {
+  ProblemDetail handleGenericException(Exception ex) {
     log.warn("Unexpected exception", ex);
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(

@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: ddd-example
+  # JPA
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    show-sql: true
+  datasource:
+    hikari:
+      auto-commit: false
+  # Datasource
+  sql:
+    init:
+      mode: always

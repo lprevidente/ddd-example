@@ -4,7 +4,7 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lprevidente.ddd_example.BaseIntegrationTest;
 import com.lprevidente.ddd_example.user.application.command.AddUser;
 import com.lprevidente.ddd_example.user.application.command.UpdateUser;
 import com.lprevidente.ddd_example.user.domain.UserId;
@@ -12,17 +12,11 @@ import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @Sql(value = "/users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-class UserIntegrationTest {
+class UserIntegrationTest extends BaseIntegrationTest {
 
   private static final UUID EXISTING_USER_ID_UUID =
       UUID.fromString("11111111-1111-1111-1111-111111111111");
@@ -31,10 +25,6 @@ class UserIntegrationTest {
 
   private static final UserId EXISTING_USER_ID = new UserId(EXISTING_USER_ID_UUID);
   private static final UserId NON_EXISTENT_USER_ID = new UserId(NON_EXISTENT_USER_ID_UUID);
-
-  @Autowired private MockMvc mockMvc;
-
-  @Autowired private ObjectMapper objectMapper;
 
   @Nested
   @DisplayName("GET /api/v1/users")
@@ -95,7 +85,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isCreated())
           .andExpect(jsonPath("$", notNullValue()));
 
@@ -116,7 +106,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -130,7 +120,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -144,7 +134,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -158,7 +148,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -172,7 +162,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -187,7 +177,7 @@ class UserIntegrationTest {
           .perform(
               post("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(addUser)))
+                  .content(jsonMapper.writeValueAsString(addUser)))
           .andExpect(status().isConflict())
           .andExpect(jsonPath("$.errorCode", equalTo("EMAIL_ALREADY_IN_USE")));
     }
@@ -219,7 +209,7 @@ class UserIntegrationTest {
           .perform(
               put("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(updateUser)))
+                  .content(jsonMapper.writeValueAsString(updateUser)))
           .andExpect(status().isNoContent());
 
       // Verify user is updated
@@ -240,7 +230,7 @@ class UserIntegrationTest {
           .perform(
               put("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(updateUser)))
+                  .content(jsonMapper.writeValueAsString(updateUser)))
           .andExpect(status().isNotFound());
     }
 
@@ -254,7 +244,7 @@ class UserIntegrationTest {
           .perform(
               put("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(updateUser)))
+                  .content(jsonMapper.writeValueAsString(updateUser)))
           .andExpect(status().isBadRequest());
     }
 
@@ -268,7 +258,7 @@ class UserIntegrationTest {
           .perform(
               put("/api/v1/users")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(updateUser)))
+                  .content(jsonMapper.writeValueAsString(updateUser)))
           .andExpect(status().isBadRequest());
     }
 

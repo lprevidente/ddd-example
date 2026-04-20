@@ -22,19 +22,19 @@ class TeamMemberController {
   private final TeamMemberQueryService teamMemberQueryService;
 
   @GetMapping
-  public Collection<TeamMemberDto> getTeamMembers(@PathVariable TeamId teamId) {
+  Collection<TeamMemberDto> getTeamMembers(@PathVariable TeamId teamId) {
     return teamMemberQueryService.getTeamMembers(teamId);
   }
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  public void addMember(@RequestBody @Valid AddUserToTeam command) {
+  void addMember(@RequestBody @Valid AddUserToTeam command) {
     pipeline.send(command);
   }
 
   @DeleteMapping("{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
-  public void removeMemberFromTeam(@PathVariable TeamId teamId, @PathVariable UserId userId) {
+  void removeMemberFromTeam(@PathVariable TeamId teamId, @PathVariable UserId userId) {
     pipeline.send(new RemoveUserFromTeam(teamId, userId));
   }
 }

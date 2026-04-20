@@ -4,31 +4,22 @@ import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.lprevidente.ddd_example.BaseIntegrationTest;
 import com.lprevidente.ddd_example.team.application.command.CreateTeam;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest
-@AutoConfigureMockMvc
 @Sql(value = "/team.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
-class TeamIntegrationTest {
+class TeamIntegrationTest extends BaseIntegrationTest {
 
   private static final UUID EXISTING_TEAM_ID_UUID =
       UUID.fromString("44444444-4444-4444-4444-444444444444");
   private static final UUID NON_EXISTENT_TEAM_ID_UUID =
       UUID.fromString("99999999-9999-9999-9999-999999999999");
-
-  @Autowired private MockMvc mockMvc;
-  @Autowired private ObjectMapper objectMapper;
 
   @Nested
   @DisplayName("GET /api/v1/teams")
@@ -61,7 +52,7 @@ class TeamIntegrationTest {
           .perform(
               post("/api/v1/teams")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(createTeam)))
+                  .content(jsonMapper.writeValueAsString(createTeam)))
           .andExpect(status().isCreated())
           .andExpect(jsonPath("$", notNullValue()));
 
@@ -82,7 +73,7 @@ class TeamIntegrationTest {
           .perform(
               post("/api/v1/teams")
                   .contentType(MediaType.APPLICATION_JSON)
-                  .content(objectMapper.writeValueAsString(createTeam)))
+                  .content(jsonMapper.writeValueAsString(createTeam)))
           .andExpect(status().isBadRequest());
     }
 

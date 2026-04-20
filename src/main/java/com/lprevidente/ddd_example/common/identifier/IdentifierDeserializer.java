@@ -1,17 +1,15 @@
 package com.lprevidente.ddd_example.common.identifier;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.BeanProperty;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
-import java.io.IOException;
 import java.util.UUID;
 import lombok.NoArgsConstructor;
+import tools.jackson.core.JacksonException;
+import tools.jackson.core.JsonParser;
+import tools.jackson.databind.BeanProperty;
+import tools.jackson.databind.DeserializationContext;
+import tools.jackson.databind.ValueDeserializer;
 
 @NoArgsConstructor
-class IdentifierDeserializer extends JsonDeserializer<Object>
-    implements ContextualDeserializer {
+class IdentifierDeserializer extends ValueDeserializer<Object> {
 
   private Class<?> targetClass;
 
@@ -20,9 +18,9 @@ class IdentifierDeserializer extends JsonDeserializer<Object>
   }
 
   @Override
-  public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+  public Object deserialize(JsonParser p, DeserializationContext ctxt) throws JacksonException {
     if (targetClass == null) {
-      throw new IOException("Target class not set for IdentifierDeserializer");
+      throw ctxt.instantiationException(Object.class, "Target class not set for IdentifierDeserializer");
     }
 
     String value = p.getValueAsString();
@@ -34,12 +32,12 @@ class IdentifierDeserializer extends JsonDeserializer<Object>
       final var uuid = UUID.fromString(value);
       return targetClass.getConstructor(UUID.class).newInstance(uuid);
     } catch (Exception e) {
-      throw new IOException("Failed to deserialize identifier: " + e.getMessage(), e);
+      throw ctxt.instantiationException(targetClass, e);
     }
   }
 
   @Override
-  public JsonDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
+  public ValueDeserializer<?> createContextual(DeserializationContext ctxt, BeanProperty property) {
     Class<?> targetType = ctxt.getContextualType().getRawClass();
     return new IdentifierDeserializer(targetType);
   }
