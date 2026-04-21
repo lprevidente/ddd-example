@@ -2,305 +2,203 @@
 
 [![Run Tests](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml/badge.svg)](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml)
 
-A Spring Boot application demonstrating Domain-Driven Design (DDD) principles with a focus on clean architecture,
-modularity, and separation of concerns.
+A Spring Boot application exploring Domain-Driven Design (DDD) and CQRS with a toy team-management domain. The point is
+the **shape of the code**, not the feature set.
 
-> **Note**: This project is a learning resource for understanding DDD principles in practice. It's intended as an
-> educational example, and any feedback or suggestions for improvement are welcomed and appreciated.
+> **Note**: This is a learning project. Feedback and suggestions are welcome.
 
-## Overview
+## Stack
 
-This project showcases a practical implementation of DDD concepts in a Java Spring Boot environment, featuring:
+| Layer              | Technology                                                          |
+|--------------------|---------------------------------------------------------------------|
+| Language           | Java 25                                                             |
+| Framework          | Spring Boot 4.0.5                                                   |
+| Persistence        | Spring Data JPA, Hibernate 7, PostgreSQL                            |
+| Modularity         | Spring Modulith 2.0.5                                               |
+| DDD semantics      | jMolecules (DDD + CQRS + events annotations, BOM `2025.0.2`)        |
+| JPA translation    | `jmolecules-jpa` + `jmolecules-spring` via ByteBuddy (compile-time) |
+| Architecture tests | `jmolecules-archunit` + ArchUnit                                    |
+| Utilities          | Lombok, JSpecify, Jackson 3                                         |
+| Dev DB             | PostgreSQL via Docker Compose                                       |
+| Test DB            | H2 in-memory                                                        |
 
-- Clear domain boundaries and aggregates
-- Modular application structure
-- Rich domain models with business logic
-- Domain events for cross-aggregate communication
-- CQRS pattern for separating read and write operations
+---
 
-## What the Application Does
+## Package Structure
 
-This application is a team management system built using Domain-Driven Design (DDD) principles. It allows users to:
+```
+com.lprevidente.ddd_example/
+├── Application.java
+├── config/                          # SecurityConfig + GlobalExceptionHandler (RFC 7807)
+├── common/
+│   ├── exception/                   # DomainException base (named interface)
+│   └── identifier/                  # Identifier<UUID> + Jackson/Spring converters (named interface)
+├── user/                            # Bounded context: User
+│   ├── api/                         # Named interface exposed to other modules
+│   │   ├── UserApi.java
+│   │   └── UserIdDto.java
+│   ├── application/
+│   │   ├── command/                 # AddUser, UpdateUser, DeleteUser
+│   │   ├── handler/                 # One handler per command
+│   │   ├── dto/                     # Spring Data projection interfaces (read models)
+│   │   └── UserQueryService.java
+│   ├── domain/
+│   │   ├── User.java                # Aggregate root
+│   │   ├── UserId.java              # Value object
+│   │   ├── Email.java               # Value object
+│   │   ├── Password.java            # Value object
+│   │   ├── Users.java               # Repository interface
+│   │   └── exception/
+│   └── infrastructure/rest/
+│       └── UserController.java
+└── team/                            # Bounded context: Team
+    ├── application/
+    │   ├── command/                 # CreateTeam, DeleteTeam, AddUserToTeam, RemoveUserFromTeam
+    │   ├── handler/                 # One handler per command
+    │   ├── dto/                     # Spring Data projection interfaces (read models)
+    │   ├── TeamQueryService.java
+    │   └── TeamMemberQueryService.java
+    ├── domain/
+    │   ├── Team.java                # Aggregate root
+    │   ├── TeamId.java              # Value object
+    │   ├── TeamMember.java          # Aggregate root
+    │   ├── TeamMemberId.java        # Value object (composite: TeamId + UserId)
+    │   ├── UserId.java              # Local copy — intentionally separate from user.domain.UserId
+    │   ├── Teams.java               # Repository interface
+    │   ├── TeamMembers.java         # Repository interface
+    │   ├── event/
+    │   │   └── TeamCreated.java     # Domain event
+    │   └── exception/
+    └── infrastructure/rest/
+        ├── TeamController.java
+        └── TeamMemberController.java
+```
 
-Register and manage user accounts with personal information (first name, last name, email)
-Create teams with names
-Add users to teams and remove them from teams
-View team details and team members
+### Key structural rules
 
-The core functionality revolves around managing the relationship between users and teams, implemented via a many-to-many
-relationship through the TeamMember entity.
+- **`domain/`** is persistence-ignorant. No `@Entity`, `@Embeddable`, or `@Id` are hand-written — `jmolecules-jpa`
+  translates `@AggregateRoot` → `@Entity`, `@ValueObject` → `@Embeddable`, `@Identity` → `@EmbeddedId`/`@Id` at
+  compile time via ByteBuddy.
+- **`application/`** owns orchestration only: commands (records), handlers (one per command), projection DTOs, and query
+  services. No domain logic lives here.
+- **`infrastructure/`** contains only framework adapters (`@RestController`). Controllers are package-private and inject
+  handlers directly — no mediator or dispatcher.
+- **Cross-module access** goes exclusively through `user/api/` (the Modulith named interface). The `team` context never
+  touches `user.domain`.
 
-## Applied Constraints and Design Decisions
+---
 
-### Domain Constraints
+## CQRS Write Side
 
-- Email Uniqueness: Each email can only be used by one user (enforced via EmailAlreadyInUseException)
-- Password Complexity: Passwords must meet specific strength requirements (length, uppercase, lowercase, digits, special
-  characters)
-- Team Membership: A user cannot be added to the same team twice (enforced in the TeamMember constructor)
-- User and Team IDs: All entities use UUID-based identifiers rather than sequential numeric IDs
+Commands are plain records in `application/command/` annotated with `@Command`. Each command has exactly one handler in
+`application/handler/` annotated with `@Service`:
 
-## Architecture
+```
+Controller  →  Handler.handle(command)  →  Domain aggregate  →  Repository
+```
 
-The application is organized around two main bounded contexts:
+No mediator. Controllers inject the specific handler they need. The handler's `handle()` method is annotated
+`@CommandHandler` (jMolecules).
 
-- **User Management**: Handles user registration and profile information
-- **Team Management**: Manages teams and team memberships
+**Example flow — create a team:**
 
-Each bounded context maintains its own domain models, repositories, and services while exposing carefully designed APIs
-for cross-domain interactions.
+```
+POST /api/v1/teams
+  └─ TeamController.create(CreateTeam)
+       └─ CreateTeamHandler.handle(CreateTeam)
+            └─ new Team(name)           // domain constructor, registers TeamCreated event
+                 └─ teams.save(team)    // Spring Data JPA
+```
 
-## Technology Stack
+## CQRS Read Side
 
-- Java 25
-- Spring Boot 4.0.5
-- Spring Data JPA
-- Spring Security
-- Spring Modulith 2.0.5 for enforcing modular architecture
-- PostgreSQL (via Docker Compose)
-- H2 in-memory database for tests
-- Lombok for reducing boilerplate code
+Reads never go through a command handler. Each context has a `*QueryService` that returns **Spring Data projection
+interfaces** (`@QueryModel`) — no aggregate leaks out of the repository:
 
-## Key DDD Concepts Demonstrated
+```
+Controller  →  QueryService  →  Repository.findXxx(Class<T>)  →  Projection DTO
+```
 
-### Aggregates & Entities
+Cross-context read enrichment: `TeamMemberQueryService` loads memberships, then calls `UserApi.findAllById(ids,
+MemberDto.class)` to hydrate user data from the user module.
 
-- `User` - Aggregate root for user data
-- `Team` - Aggregate root for team management
-- `TeamMember` - Entity representing team membership
+---
+
+## Domain Conventions
+
+### Aggregates
+
+- Annotated `@AggregateRoot` (jMolecules); `@Entity` added by transformer
+- Protected no-arg constructor for Hibernate
+- **Invariants are enforced in the constructor** — repositories and cross-module APIs are passed in so the aggregate can
+  validate itself at creation time:
+    - `new User(firstName, lastName, password, email, users)` — checks email uniqueness
+    - `new TeamMember(teamId, userId, teams, users, teamMembers)` — checks team/user existence + no duplicate membership
 
 ### Value Objects
 
-- `Email` - Encapsulates email validation
-- `Password` - Handles password hashing and validation
-- `UserId` and `TeamId` - Strongly typed identifiers
-
-### Command Handlers (CQRS)
-
-The application follows the Command Query Responsibility Segregation pattern:
-
-- Each command (e.g., `CreateTeam`, `AddUserToTeam`) has a dedicated handler
-- Commands represent intent to change state
-- Queries are separated from commands for optimized read operations
-
-### Application Services
-
-- `TeamMemberService` - Coordinates operations across aggregates
-
-### Repositories
-
-Each aggregate has its dedicated repository with domain-specific method signatures.
+- Records implementing `Identifier<UUID>` for IDs (`UserId`, `TeamId`, `TeamMemberId`)
+- Annotated `@ValueObject` (jMolecules); `@Embeddable` added by transformer
+- Compact constructors enforce invariants (`Email` validates format, `Password` enforces strength rules)
 
 ### Domain Events
 
-- `TeamCreated` - Event triggered when a new team is created
+- `Team` extends `AbstractAggregateRoot<Team>` and registers `TeamCreated` on construction
+- Published automatically by Spring Data on `save()`
+
+### Modulith boundaries
+
+- `user/api/` is declared as a named interface — the only package other modules may import from `user`
+- `common/identifier/` is a named interface shared across all modules
+- `VeryModulithTest` verifies boundaries at test time via `ApplicationModules.of(Application.class).verify()`
+- `DddRulesTest` runs `JMoleculesDddRules.all()` (ArchUnit) to verify aggregate/entity/value-object rules
+
+---
+
+## JPA Without JPA Annotations
+
+The domain model is kept free of persistence annotations. The `byte-buddy-maven-plugin` runs `JMoleculesPlugin` at
+`process-classes` and rewrites bytecode:
+
+| Source annotation                     | Added by transformer                  |
+|---------------------------------------|---------------------------------------|
+| `@AggregateRoot`                      | `@Entity`                             |
+| `@ValueObject`                        | `@Embeddable`                         |
+| `@Identity` on a value-object field   | `@EmbeddedId`                         |
+| `@Identity` on a primitive/UUID field | `@Id`                                 |
+| Non-null aggregate fields             | `@PostLoad`/`@PrePersist` null checks |
+| `@Repository` (jMolecules)            | `@Repository` (Spring)                |
+| `@Service` (jMolecules)               | `@Service` (Spring)                   |
+
+Source classes only carry what the transformer can't derive: `@Table`, `@AttributeOverride`, `@Column`.
+
+To inspect the result: `javap -v -p target/classes/.../User.class`
+
+---
 
 ## API Endpoints
 
-### User Management
+- **Users** `POST /api/v1/users` — register; `GET /api/v1/users[/{id}]` — list/get; `PUT /{id}` — update;
+  `DELETE /{id}` — delete
+- **Teams** `POST /api/v1/teams` — create; `GET /api/v1/teams[/{id}]` — list/get; `DELETE /{id}` — delete
+- **Members** `POST /api/teams/{teamId}/members` — add user; `GET /members` — list;
+  `DELETE /members/{userId}` — remove
 
-- `GET /api/users` - List all users
-- `GET /api/users/{id}` - Get user details
-- `POST /api/users` - Register a new user
-- `PUT /api/users/{id}` - Update user information
+---
 
-### Team Management
+## Running
 
-- `GET /api/teams` - List all teams
-- `GET /api/teams/{id}` - Get team details
-- `POST /api/teams` - Create a new team
-- `PUT /api/teams/{id}` - Update team information
-- `DELETE /api/teams/{id}` - Delete a team
+**Prerequisites:** Java 25, Maven, Docker
 
-### Team Membership
-
-- `GET /api/teams/{teamId}/members` - List team members
-- `POST /api/teams/{teamId}/members` - Add user to team
-- `DELETE /api/teams/{teamId}/members/{userId}` - Remove user from team
-- `GET /api/users/{userId}/teams` - List teams for a user
-
-## Running the Application
-
-### Prerequisites
-
-- Java 25
-- Maven
-- Docker (for PostgreSQL via Docker Compose)
-
-### Setup
-
-1. Clone the repository:
-   ```
-   git clone https://github.com/yourusername/ddd-example.git
-   cd ddd-example
-   ```
-
-2. Start the database (Docker must be running — Spring Boot will start PostgreSQL automatically via Docker Compose)
-
-3. Build and run the application:
-   ```
-   ./mvnw spring-boot:run
-   ```
-
-The application will start on `http://localhost:8080`
-
-## Domain Model
-
-### User Context
-
-```
-User
- |-- UserId
- |-- Email
- |-- Password
- |-- FirstName
- |-- LastName
+```bash
+./mvnw spring-boot:run          # starts app + Postgres via Docker Compose
+./mvnw test                     # run all tests (H2)
+./mvnw test -Dtest=TeamIntegrationTest
 ```
 
-### Team Context
-
-```
-Team
- |-- TeamId
- |-- Name
- |-- CreatedAt
-
-TeamMember
- |-- TeamMemberId (composite: TeamId + UserId)
- |-- JoinedAt
-```
-
-## Design Decisions
-
-1. **Explicit Value Objects**: Using record types for immutable value objects
-2. **Rich Domain Models**: Business logic and validation in domain classes
-3. **Validation**: Domain-specific validation in entity constructors
-4. **Bounded Contexts**: Clear separation between User and Team domains
-5. **Domain Events**: Using Spring's AbstractAggregateRoot for domain events
-6. **CQRS Pattern**: Separate command and query responsibilities for better scalability and maintainability
-
-## Class Diagram
-
-Here's a simplified class diagram that focuses on the core domain models and the CQRS pattern implementation.
-
-```mermaid
-classDiagram
-%% Core Domain Models
-    class User {
-        -UserId id
-        -String firstName
-        -String lastName
-        -Password password
-        -Email email
-    }
-
-    class Team {
-        -TeamId id
-        -String name
-        -LocalDateTime createdAt
-    }
-
-    class TeamMember {
-        -TeamMemberId id
-        -LocalDateTime joinedAt
-        +getTeamId()
-        +getUserId()
-    }
-
-%% Value Objects
-    class UserId {
-        -UUID id
-    }
-
-    class TeamId {
-        -UUID id
-    }
-
-    class TeamMemberId {
-        -TeamId teamId
-        -UserId userId
-    }
-
-    class Email {
-        -String value
-    }
-
-    class Password {
-        -String hashedValue
-        +matches(String plainTextPassword)
-    }
-
-%% CQRS Commands and Handlers
-    class CreateUserCommand {
-        -String firstName
-        -String lastName
-        -String email
-        -String password
-    }
-
-    class CreateTeamCommand {
-        -String name
-    }
-
-    class AddUserToTeamCommand {
-        -TeamId teamId
-        -UserId userId
-    }
-
-    class RemoveUserFromTeamCommand {
-        -TeamId teamId
-        -UserId userId
-    }
-
-    class CreateUserCommandHandler {
-        +handle(CreateUserCommand)
-    }
-
-    class CreateTeamCommandHandler {
-        +handle(CreateTeamCommand)
-    }
-
-    class AddUserToTeamCommandHandler {
-        +handle(AddUserToTeamCommand)
-    }
-
-    class RemoveUserFromTeamCommandHandler {
-        +handle(RemoveUserFromTeamCommand)
-    }
-
-%% Relationships
-    Team "1" *-- "1" TeamId: has
-    User "1" *-- "1" UserId: has
-    TeamMember "1" *-- "1" TeamMemberId: has
-    TeamMemberId "1" *-- "1" TeamId: contains
-    TeamMemberId "1" *-- "1" UserId: contains
-    User "1" *-- "1" Email: has
-    User "1" *-- "1" Password: has
-    Team "1" -- "*" TeamMember: has
-    User "1" -- "*" TeamMember: belongs to
-    CreateUserCommandHandler ..> User: creates
-    CreateTeamCommandHandler ..> Team: creates
-    AddUserToTeamCommandHandler ..> TeamMember: creates
-    RemoveUserFromTeamCommandHandler ..> TeamMember: removes
-    CreateUserCommand --> CreateUserCommandHandler: handled by
-    CreateTeamCommand --> CreateTeamCommandHandler: handled by
-    AddUserToTeamCommand --> AddUserToTeamCommandHandler: handled by
-    RemoveUserFromTeamCommand --> RemoveUserFromTeamCommandHandler: handled by
-```
-
-## Future Enhancements
-
-- Add authentication and authorization
-- Implement more sophisticated domain events
-- Add more complex business rules
+---
 
 ## Learning & Contributions
 
-This project serves as a practical example for learning DDD principles. If you have suggestions or see opportunities for
-better applying DDD concepts, please feel free to:
-
-1. Open an issue with your feedback
-2. Submit a pull request with improvements
-3. Start a discussion about alternative implementations
-
-The goal is to create a collaborative learning resource for the community, so all constructive input is valuable.
+If you have suggestions or see opportunities for better applying DDD concepts, feel free to open an issue or a pull
+request.

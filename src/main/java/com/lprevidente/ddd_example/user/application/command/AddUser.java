@@ -1,12 +1,11 @@
-package com.lprevidente.ddd_example.user.application.command; // application/dto/UserRegistrationDTO.java
+package com.lprevidente.ddd_example.user.application.command;
 
-import com.lprevidente.ddd_example.pipeline.Command;
-import com.lprevidente.ddd_example.user.domain.UserId;
 import jakarta.validation.constraints.NotBlank;
+import org.jmolecules.architecture.cqrs.Command;
 
+@Command
 public record AddUser(
     @NotBlank String firstName,
     @NotBlank String lastName,
     @NotBlank String email,
-    @NotBlank String password)
-    implements Command<UserId> {}
+    @NotBlank String password) {}

@@ -1,17 +1,18 @@
 package com.lprevidente.ddd_example.user.application.handler;
 
-import com.lprevidente.ddd_example.pipeline.Command;
 import com.lprevidente.ddd_example.user.application.command.AddUser;
 import com.lprevidente.ddd_example.user.domain.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.jmolecules.architecture.cqrs.CommandHandler;
+import org.jmolecules.ddd.annotation.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-class AddUserHandler implements Command.Handler<AddUser, UserId> {
+public class AddUserHandler {
 
   private final Users users;
 
+  @CommandHandler
   public UserId handle(AddUser command) {
     final var user =
         new User(

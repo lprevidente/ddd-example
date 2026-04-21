@@ -1,23 +1,24 @@
 package com.lprevidente.ddd_example.team.domain;
 
 import com.lprevidente.ddd_example.user.api.UserApi;
-import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.jmolecules.ddd.annotation.AggregateRoot;
+import org.jmolecules.ddd.annotation.Identity;
 import org.springframework.util.Assert;
 
 @Getter
-@Entity
+@AggregateRoot
 @Table(name = "team_members")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class TeamMember {
 
-  @EmbeddedId private TeamMemberId id;
+  @Identity private TeamMemberId id;
 
   private LocalDateTime joinedAt;
+
+  protected TeamMember() {}
 
   public TeamMember(
       TeamId teamId, //

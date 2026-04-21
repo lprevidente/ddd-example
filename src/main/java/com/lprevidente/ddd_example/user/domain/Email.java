@@ -1,7 +1,9 @@
 package com.lprevidente.ddd_example.user.domain;
 
+import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.util.Assert;
 
+@ValueObject
 public record Email(String value) {
 
   public Email {

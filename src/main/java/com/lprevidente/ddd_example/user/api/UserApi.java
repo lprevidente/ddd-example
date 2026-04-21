@@ -4,7 +4,9 @@ import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import org.jmolecules.ddd.annotation.Service;
 
+@Service
 public interface UserApi {
 
   boolean existsById(UUID id);

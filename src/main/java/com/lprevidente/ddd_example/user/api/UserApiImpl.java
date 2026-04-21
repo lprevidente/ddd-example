@@ -8,7 +8,7 @@ import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.jmolecules.ddd.annotation.Service;
 
 @Service
 @RequiredArgsConstructor

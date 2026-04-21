@@ -1,5 +1,6 @@
-package com.lprevidente.ddd_example.exception;
+package com.lprevidente.ddd_example.config;
 
+import com.lprevidente.ddd_example.common.exception.DomainException;
 import jakarta.validation.ConstraintViolationException;
 import java.util.NoSuchElementException;
 import lombok.extern.slf4j.Slf4j;

@@ -1,10 +1,11 @@
-package com.lprevidente.ddd_example.team.infrastructure;
+package com.lprevidente.ddd_example.team.infrastructure.rest;
 
-import com.lprevidente.ddd_example.pipeline.Pipeline;
 import com.lprevidente.ddd_example.team.application.TeamQueryService;
 import com.lprevidente.ddd_example.team.application.command.CreateTeam;
 import com.lprevidente.ddd_example.team.application.command.DeleteTeam;
 import com.lprevidente.ddd_example.team.application.dto.TeamInfoDto;
+import com.lprevidente.ddd_example.team.application.handler.CreateTeamHandler;
+import com.lprevidente.ddd_example.team.application.handler.DeleteTeamHandler;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import jakarta.validation.Valid;
 import java.util.Collection;
@@ -17,8 +18,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 class TeamController {
 
-  private final Pipeline pipeline;
   private final TeamQueryService teamQueryService;
+  private final CreateTeamHandler createTeamHandler;
+  private final DeleteTeamHandler deleteTeamHandler;
 
   @GetMapping
   Collection<TeamInfoDto> getTeams() {
@@ -28,12 +30,12 @@ class TeamController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   TeamId createTeam(@RequestBody @Valid CreateTeam command) {
-    return pipeline.send(command);
+    return createTeamHandler.handle(command);
   }
 
   @DeleteMapping("{id}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void deleteTeam(@PathVariable @Valid TeamId id) {
-    pipeline.send(new DeleteTeam(id));
+    deleteTeamHandler.handle(new DeleteTeam(id));
   }
 }

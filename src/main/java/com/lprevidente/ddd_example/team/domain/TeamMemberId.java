@@ -2,24 +2,21 @@ package com.lprevidente.ddd_example.team.domain;
 
 import jakarta.persistence.AttributeOverride;
 import jakarta.persistence.Column;
-import jakarta.persistence.Embeddable;
-import jakarta.persistence.Embedded;
 import java.io.Serializable;
 import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.jmolecules.ddd.annotation.ValueObject;
 
 /** Composite ID for TeamMembership consisting of teamId and userId */
 @Getter
-@Embeddable
+@ValueObject
 @NoArgsConstructor
 public class TeamMemberId implements Serializable {
 
-  @Embedded
   @AttributeOverride(name = "id", column = @Column(name = "team_id"))
   private TeamId teamId;
 
-  @Embedded
   @AttributeOverride(name = "id", column = @Column(name = "user_id"))
   private UserId userId;
 

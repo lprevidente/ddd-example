@@ -1,31 +1,32 @@
 package com.lprevidente.ddd_example.user.domain;
 
 import com.lprevidente.ddd_example.user.domain.exception.EmailAlreadyInUseException;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeOverride;
+import jakarta.persistence.Column;
+import jakarta.persistence.Table;
 import java.util.Objects;
-import lombok.AccessLevel;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import org.jmolecules.ddd.annotation.AggregateRoot;
+import org.jmolecules.ddd.annotation.Identity;
 import org.springframework.util.Assert;
 
 @Getter
-@Entity
+@AggregateRoot
 @Table(name = "users")
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class User {
 
-  @EmbeddedId private UserId id;
+  @Identity private UserId id;
 
   private String firstName;
   private String lastName;
 
-  @Embedded
   @AttributeOverride(name = "hashedValue", column = @Column(name = "password"))
   private Password password;
 
-  @Embedded
   @AttributeOverride(name = "value", column = @Column(name = "email", unique = true))
   private Email email;
+
+  protected User() {}
 
   public User(String firstName, String lastName, Password password, Email email, Users users) {
     Assert.notNull(firstName, "firstName must not be null");

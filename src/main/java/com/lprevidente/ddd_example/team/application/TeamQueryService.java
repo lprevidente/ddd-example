@@ -4,7 +4,7 @@ import com.lprevidente.ddd_example.team.application.dto.TeamInfoDto;
 import com.lprevidente.ddd_example.team.domain.Teams;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.jmolecules.ddd.annotation.Service;
 
 @Service
 @RequiredArgsConstructor

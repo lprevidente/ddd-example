@@ -1,6 +1,6 @@
 package com.lprevidente.ddd_example.team.domain.exception;
 
-import com.lprevidente.ddd_example.exception.DomainException;
+import com.lprevidente.ddd_example.common.exception.DomainException;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import org.springframework.http.HttpStatus;
 

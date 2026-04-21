@@ -1,8 +1,10 @@
-package com.lprevidente.ddd_example.exception;
+package com.lprevidente.ddd_example.common.exception;
 
+import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
 /** Base exception for domain-specific errors. */
+@Getter
 public class DomainException extends RuntimeException {
 
   private final String errorCode;
@@ -22,17 +24,5 @@ public class DomainException extends RuntimeException {
     this.errorCode = errorCode;
     this.status = status;
     this.title = title;
-  }
-
-  public String getErrorCode() {
-    return errorCode;
-  }
-
-  public HttpStatus getStatus() {
-    return status;
-  }
-
-  public String getTitle() {
-    return title;
   }
 }

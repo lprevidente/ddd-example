@@ -1,10 +1,11 @@
-package com.lprevidente.ddd_example.team.infrastructure;
+package com.lprevidente.ddd_example.team.infrastructure.rest;
 
-import com.lprevidente.ddd_example.pipeline.Pipeline;
 import com.lprevidente.ddd_example.team.application.TeamMemberQueryService;
 import com.lprevidente.ddd_example.team.application.command.AddUserToTeam;
 import com.lprevidente.ddd_example.team.application.command.RemoveUserFromTeam;
 import com.lprevidente.ddd_example.team.application.dto.TeamMemberDto;
+import com.lprevidente.ddd_example.team.application.handler.AddUserToTeamHandler;
+import com.lprevidente.ddd_example.team.application.handler.RemoveUserFromTeamHandler;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import com.lprevidente.ddd_example.team.domain.UserId;
 import jakarta.validation.Valid;
@@ -18,8 +19,9 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 class TeamMemberController {
 
-  private final Pipeline pipeline;
   private final TeamMemberQueryService teamMemberQueryService;
+  private final AddUserToTeamHandler addUserToTeamHandler;
+  private final RemoveUserFromTeamHandler removeUserFromTeamHandler;
 
   @GetMapping
   Collection<TeamMemberDto> getTeamMembers(@PathVariable TeamId teamId) {
@@ -29,12 +31,12 @@ class TeamMemberController {
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
   void addMember(@RequestBody @Valid AddUserToTeam command) {
-    pipeline.send(command);
+    addUserToTeamHandler.handle(command);
   }
 
   @DeleteMapping("{userId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   void removeMemberFromTeam(@PathVariable TeamId teamId, @PathVariable UserId userId) {
-    pipeline.send(new RemoveUserFromTeam(teamId, userId));
+    removeUserFromTeamHandler.handle(new RemoveUserFromTeam(teamId, userId));
   }
 }

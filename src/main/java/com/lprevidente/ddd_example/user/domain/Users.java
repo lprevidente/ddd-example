@@ -3,8 +3,8 @@ package com.lprevidente.ddd_example.user.domain;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import org.jmolecules.ddd.annotation.Repository;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 @Repository

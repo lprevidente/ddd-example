@@ -6,7 +6,7 @@ import com.lprevidente.ddd_example.user.domain.Users;
 import com.lprevidente.ddd_example.user.domain.exception.UserNotFoundException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.jmolecules.ddd.annotation.Service;
 
 @Service
 @RequiredArgsConstructor

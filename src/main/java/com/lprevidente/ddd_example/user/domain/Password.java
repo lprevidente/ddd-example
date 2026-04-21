@@ -1,9 +1,11 @@
 package com.lprevidente.ddd_example.user.domain;
 
 import java.util.regex.Pattern;
+import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.util.Assert;
 
+@ValueObject
 public record Password(String hashedValue) {
 
   // Compact constructor for validation

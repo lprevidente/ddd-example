@@ -10,7 +10,7 @@ import com.lprevidente.ddd_example.user.api.UserApi;
 import java.util.Collection;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
+import org.jmolecules.ddd.annotation.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service

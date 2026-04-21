@@ -1,25 +1,24 @@
 package com.lprevidente.ddd_example.user.application.handler;
 
-import com.lprevidente.ddd_example.pipeline.Command;
 import com.lprevidente.ddd_example.user.application.command.DeleteUser;
 import com.lprevidente.ddd_example.user.domain.Users;
 import com.lprevidente.ddd_example.user.domain.exception.UserNotFoundException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
+import org.jmolecules.architecture.cqrs.CommandHandler;
+import org.jmolecules.ddd.annotation.Service;
 
-@Component
+@Service
 @RequiredArgsConstructor
-class DeleteUserHandler implements Command.Handler<DeleteUser, Void> {
+public class DeleteUserHandler {
 
   private final Users users;
 
-  @Override
-  public Void handle(DeleteUser command) {
+  @CommandHandler
+  public void handle(DeleteUser command) {
     final var user =
         users
             .findById(command.id()) //
             .orElseThrow(() -> new UserNotFoundException(command.id()));
     users.delete(user);
-    return null;
   }
 }

@@ -1,18 +1,21 @@
 package com.lprevidente.ddd_example.team.domain;
 
 import com.lprevidente.ddd_example.team.domain.event.TeamCreated;
-import jakarta.persistence.*;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
 import lombok.Getter;
+import org.jmolecules.ddd.annotation.AggregateRoot;
+import org.jmolecules.ddd.annotation.Identity;
 import org.springframework.data.domain.AbstractAggregateRoot;
 import org.springframework.util.Assert;
 
-@Entity
 @Getter
+@AggregateRoot
 @Table(name = "teams")
 public class Team extends AbstractAggregateRoot<Team> {
-  @EmbeddedId private TeamId id;
+
+  @Identity private TeamId id;
 
   private String name;
   private LocalDateTime createdAt;
@@ -26,7 +29,6 @@ public class Team extends AbstractAggregateRoot<Team> {
     this.name = name;
     this.createdAt = LocalDateTime.now();
 
-    // Register domain event (could be used for notifications, analytics, etc.)
     registerEvent(new TeamCreated(this));
   }
 
