@@ -40,8 +40,8 @@ com.lprevidente.ddd_example/
 │   ├── application/
 │   │   ├── command/                 # AddUser, UpdateUser, DeleteUser
 │   │   ├── handler/                 # One handler per command
-│   │   ├── dto/                     # Spring Data projection interfaces (read models)
-│   │   └── UserQueryService.java
+│   │   ├── query/                   # UserQueryService + UserReadRepository (read side)
+│   │   └── projection/              # UserView (Spring Data projection interface)
 │   ├── domain/
 │   │   ├── User.java                # Aggregate root
 │   │   ├── UserId.java              # Value object
@@ -55,9 +55,8 @@ com.lprevidente.ddd_example/
     ├── application/
     │   ├── command/                 # CreateTeam, DeleteTeam, AddUserToTeam, RemoveUserFromTeam
     │   ├── handler/                 # One handler per command
-    │   ├── dto/                     # Spring Data projection interfaces (read models)
-    │   ├── TeamQueryService.java
-    │   └── TeamMemberQueryService.java
+    │   ├── query/                   # TeamQueryService, TeamMemberQueryService + read repositories
+    │   └── projection/              # TeamView, TeamMemberView, MemberView
     ├── domain/
     │   ├── Team.java                # Aggregate root
     │   ├── TeamId.java              # Value object
@@ -79,8 +78,8 @@ com.lprevidente.ddd_example/
 - **`domain/`** is persistence-ignorant. No `@Entity`, `@Embeddable`, or `@Id` are hand-written — `jmolecules-jpa`
   translates `@AggregateRoot` → `@Entity`, `@ValueObject` → `@Embeddable`, `@Identity` → `@EmbeddedId`/`@Id` at
   compile time via ByteBuddy.
-- **`application/`** owns orchestration only: commands (records), handlers (one per command), projection DTOs, and query
-  services. No domain logic lives here.
+- **`application/`** owns orchestration only, split by CQRS concern: `command/` + `handler/` for the write side,
+  `query/` (query services + read repositories) + `projection/` (`*View` interfaces) for the read side. No domain logic lives here.
 - **`infrastructure/`** contains only framework adapters (`@RestController`). Controllers are package-private and inject
   handlers directly — no mediator or dispatcher.
 - **Cross-module access** goes exclusively through `user/api/` (the Modulith named interface). The `team` context never
@@ -112,15 +111,19 @@ POST /api/v1/teams
 
 ## CQRS Read Side
 
-Reads never go through a command handler. Each context has a `*QueryService` that returns **Spring Data projection
-interfaces** (`@QueryModel`) — no aggregate leaks out of the repository:
+Reads never go through a command handler. The read side is fully separated from the write side:
+
+- **Domain repositories** (`domain/`) have no projection methods — write operations only
+- **Read repositories** (`application/query/`) extend Spring Data's `Repository<T,ID>` marker and expose only
+  projection queries
+- **Query services** (`application/query/`) return `*View` projection interfaces — no aggregates leak out
 
 ```
-Controller  →  QueryService  →  Repository.findXxx(Class<T>)  →  Projection DTO
+Controller  →  QueryService  →  ReadRepository.findXxx(Class<T>)  →  *View projection
 ```
 
 Cross-context read enrichment: `TeamMemberQueryService` loads memberships, then calls `UserApi.findAllById(ids,
-MemberDto.class)` to hydrate user data from the user module.
+MemberView.class)` to hydrate user data from the user module.
 
 ---
 

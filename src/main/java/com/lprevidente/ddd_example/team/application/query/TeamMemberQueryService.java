@@ -1,10 +1,9 @@
-package com.lprevidente.ddd_example.team.application;
+package com.lprevidente.ddd_example.team.application.query;
 
-import com.lprevidente.ddd_example.team.application.dto.MemberDto;
-import com.lprevidente.ddd_example.team.application.dto.TeamMemberDto;
+import com.lprevidente.ddd_example.team.application.projection.MemberView;
+import com.lprevidente.ddd_example.team.application.projection.TeamMemberView;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import com.lprevidente.ddd_example.team.domain.TeamMemberId;
-import com.lprevidente.ddd_example.team.domain.TeamMembers;
 import com.lprevidente.ddd_example.team.domain.UserId;
 import com.lprevidente.ddd_example.user.api.UserApi;
 import java.util.Collection;
@@ -17,24 +16,21 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TeamMemberQueryService {
   private final UserApi userApi;
-  private final TeamMembers teamMembers;
+  private final TeamMemberReadRepository teamMembers;
 
   @Transactional(readOnly = true)
-  public Collection<TeamMemberDto> getTeamMembers(TeamId teamId) {
-    final var memberships = teamMembers.findAllById_TeamId(teamId, TeamMemberDto.class);
+  public Collection<TeamMemberView> getTeamMembers(TeamId teamId) {
+    final var memberships = teamMembers.findAllById_TeamId(teamId, TeamMemberView.class);
 
-    // Extract all user IDs to fetch user details
     final var userIds =
-        memberships.stream() //
-            .map(TeamMemberDto::getId)
+        memberships.stream()
+            .map(TeamMemberView::getId)
             .map(TeamMemberId::getUserId)
             .map(UserId::id)
             .collect(Collectors.toSet());
 
-    // Get user details for all members at once
-    final var users = userApi.findAllById(userIds, MemberDto.class);
+    final var users = userApi.findAllById(userIds, MemberView.class);
 
-    // Enrich the views with user and team details
     memberships.forEach(
         membership -> {
           final var userId = membership.getId().getUserId().id();

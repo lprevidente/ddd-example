@@ -1,9 +1,9 @@
 package com.lprevidente.ddd_example.team.infrastructure.rest;
 
-import com.lprevidente.ddd_example.team.application.TeamMemberQueryService;
+import com.lprevidente.ddd_example.team.application.query.TeamMemberQueryService;
 import com.lprevidente.ddd_example.team.application.command.AddUserToTeam;
 import com.lprevidente.ddd_example.team.application.command.RemoveUserFromTeam;
-import com.lprevidente.ddd_example.team.application.dto.TeamMemberDto;
+import com.lprevidente.ddd_example.team.application.projection.TeamMemberView;
 import com.lprevidente.ddd_example.team.application.handler.AddUserToTeamHandler;
 import com.lprevidente.ddd_example.team.application.handler.RemoveUserFromTeamHandler;
 import com.lprevidente.ddd_example.team.domain.TeamId;
@@ -24,7 +24,7 @@ class TeamMemberController {
   private final RemoveUserFromTeamHandler removeUserFromTeamHandler;
 
   @GetMapping
-  Collection<TeamMemberDto> getTeamMembers(@PathVariable TeamId teamId) {
+  Collection<TeamMemberView> getTeamMembers(@PathVariable TeamId teamId) {
     return teamMemberQueryService.getTeamMembers(teamId);
   }
 

@@ -1,6 +1,8 @@
 package com.lprevidente.ddd_example.user.api;
 
-import com.lprevidente.ddd_example.user.domain.*;
+import com.lprevidente.ddd_example.user.application.query.UserReadRepository;
+import com.lprevidente.ddd_example.user.domain.Users;
+import com.lprevidente.ddd_example.user.domain.UserId;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -14,6 +16,7 @@ import org.jmolecules.ddd.annotation.Service;
 @RequiredArgsConstructor
 class UserApiImpl implements UserApi {
   private final Users users;
+  private final UserReadRepository userReadRepository;
 
   @Override
   public boolean existsById(UUID id) {
@@ -22,12 +25,12 @@ class UserApiImpl implements UserApi {
 
   @Override
   public <T> Optional<T> findById(UUID id, Class<T> clazz) {
-    return users.findById(new UserId(id), clazz);
+    return userReadRepository.findById(new UserId(id), clazz);
   }
 
   @Override
   public <T extends UserIdDto> Map<UUID, T> findAllById(Collection<UUID> ids, Class<T> clazz) {
-    return users.findAllByIdIn(ids.stream().map(UserId::new).toList(), clazz).stream()
+    return userReadRepository.findAllByIdIn(ids.stream().map(UserId::new).toList(), clazz).stream()
         .collect(Collectors.toMap(t -> t.getId().id(), Function.identity()));
   }
 }

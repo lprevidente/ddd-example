@@ -1,8 +1,7 @@
-package com.lprevidente.ddd_example.user.application;
+package com.lprevidente.ddd_example.user.application.query;
 
-import com.lprevidente.ddd_example.user.application.dto.UserInfoDto;
+import com.lprevidente.ddd_example.user.application.projection.UserView;
 import com.lprevidente.ddd_example.user.domain.UserId;
-import com.lprevidente.ddd_example.user.domain.Users;
 import com.lprevidente.ddd_example.user.domain.exception.UserNotFoundException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
@@ -11,15 +10,15 @@ import org.jmolecules.ddd.annotation.Service;
 @Service
 @RequiredArgsConstructor
 public class UserQueryService {
-  private final Users users;
+  private final UserReadRepository users;
 
-  public Collection<UserInfoDto> findAll() {
-    return users.findAllBy(UserInfoDto.class);
+  public Collection<UserView> findAll() {
+    return users.findAllBy(UserView.class);
   }
 
-  public UserInfoDto getUserById(UserId userId) {
+  public UserView getUserById(UserId userId) {
     return users
-        .findById(userId, UserInfoDto.class)
+        .findById(userId, UserView.class)
         .orElseThrow(() -> new UserNotFoundException(userId));
   }
 }

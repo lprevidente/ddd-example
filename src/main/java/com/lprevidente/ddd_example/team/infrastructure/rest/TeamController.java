@@ -1,9 +1,9 @@
 package com.lprevidente.ddd_example.team.infrastructure.rest;
 
-import com.lprevidente.ddd_example.team.application.TeamQueryService;
+import com.lprevidente.ddd_example.team.application.query.TeamQueryService;
 import com.lprevidente.ddd_example.team.application.command.CreateTeam;
 import com.lprevidente.ddd_example.team.application.command.DeleteTeam;
-import com.lprevidente.ddd_example.team.application.dto.TeamInfoDto;
+import com.lprevidente.ddd_example.team.application.projection.TeamView;
 import com.lprevidente.ddd_example.team.application.handler.CreateTeamHandler;
 import com.lprevidente.ddd_example.team.application.handler.DeleteTeamHandler;
 import com.lprevidente.ddd_example.team.domain.TeamId;
@@ -23,7 +23,7 @@ class TeamController {
   private final DeleteTeamHandler deleteTeamHandler;
 
   @GetMapping
-  Collection<TeamInfoDto> getTeams() {
+  Collection<TeamView> getTeams() {
     return teamQueryService.getTeams();
   }
 

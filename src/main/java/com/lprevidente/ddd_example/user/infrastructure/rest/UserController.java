@@ -1,10 +1,10 @@
 package com.lprevidente.ddd_example.user.infrastructure.rest;
 
-import com.lprevidente.ddd_example.user.application.UserQueryService;
+import com.lprevidente.ddd_example.user.application.query.UserQueryService;
 import com.lprevidente.ddd_example.user.application.command.AddUser;
 import com.lprevidente.ddd_example.user.application.command.DeleteUser;
 import com.lprevidente.ddd_example.user.application.command.UpdateUser;
-import com.lprevidente.ddd_example.user.application.dto.UserInfoDto;
+import com.lprevidente.ddd_example.user.application.projection.UserView;
 import com.lprevidente.ddd_example.user.application.handler.AddUserHandler;
 import com.lprevidente.ddd_example.user.application.handler.DeleteUserHandler;
 import com.lprevidente.ddd_example.user.application.handler.UpdateUserHandler;
@@ -25,12 +25,12 @@ class UserController {
   private final DeleteUserHandler deleteUserHandler;
 
   @GetMapping
-  Collection<UserInfoDto> getUsers() {
+  Collection<UserView> getUsers() {
     return userQueryService.findAll();
   }
 
   @GetMapping("{id}")
-  UserInfoDto getUser(@PathVariable UserId id) {
+  UserView getUser(@PathVariable UserId id) {
     return userQueryService.getUserById(id);
   }
 

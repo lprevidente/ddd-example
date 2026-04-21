@@ -93,7 +93,7 @@ class GlobalExceptionHandler {
     final var problemDetail =
         ProblemDetail.forStatusAndDetail(
             HttpStatus.BAD_REQUEST,
-            String.format("Failed to convert value '%s' to required type", ex.getValue()));
+            "Failed to convert value '%s' to required type".formatted(ex.getValue()));
     problemDetail.setTitle("Type Mismatch");
     problemDetail.setProperty("parameter", ex.getName());
     problemDetail.setProperty("requiredType", ex.getRequiredType().getSimpleName());
