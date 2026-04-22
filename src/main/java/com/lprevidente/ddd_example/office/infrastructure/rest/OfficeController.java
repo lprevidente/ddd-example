@@ -1,0 +1,45 @@
+package com.lprevidente.ddd_example.office.infrastructure.rest;
+
+import com.lprevidente.ddd_example.office.application.command.CreateOffice;
+import com.lprevidente.ddd_example.office.application.command.DeleteOffice;
+import com.lprevidente.ddd_example.office.application.handler.CreateOfficeHandler;
+import com.lprevidente.ddd_example.office.application.handler.DeleteOfficeHandler;
+import com.lprevidente.ddd_example.office.application.projection.OfficeView;
+import com.lprevidente.ddd_example.office.application.query.OfficeQueryService;
+import com.lprevidente.ddd_example.office.domain.OfficeId;
+import jakarta.validation.Valid;
+import java.util.Collection;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping("/api/v1/offices")
+@RequiredArgsConstructor
+class OfficeController {
+  private final OfficeQueryService officeQueryService;
+  private final CreateOfficeHandler createOfficeHandler;
+  private final DeleteOfficeHandler deleteOfficeHandler;
+
+  @GetMapping
+  Collection<OfficeView> getOffices() {
+    return officeQueryService.findAll();
+  }
+
+  @GetMapping("{id}")
+  OfficeView getOffice(@PathVariable OfficeId id) {
+    return officeQueryService.getById(id);
+  }
+
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  OfficeId createOffice(@RequestBody @Valid CreateOffice command) {
+    return createOfficeHandler.handle(command);
+  }
+
+  @DeleteMapping("{id}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  void deleteOffice(@PathVariable OfficeId id) {
+    deleteOfficeHandler.handle(new DeleteOffice(id));
+  }
+}

@@ -1,22 +1,14 @@
 package com.lprevidente.ddd_example.team;
 
-import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
 import com.lprevidente.ddd_example.BaseIntegrationTest;
 import com.lprevidente.ddd_example.team.application.command.AddUserToTeam;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.test.web.servlet.MockMvc;
-import tools.jackson.databind.json.JsonMapper;
 
 @Sql(
     value = {"/users.sql", "/team.sql", "/team_members.sql"},
@@ -42,29 +34,47 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return all members of a team")
-    void shouldReturnAllMembersOfTeam() throws Exception {
-      mockMvc
-          .perform(get("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$", hasSize(2)));
+    void shouldReturnAllMembersOfTeam() {
+      mockMvcTester
+          .get()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatusOk()
+          .bodyJson()
+          .extractingPath("$")
+          .asArray()
+          .hasSize(2);
     }
 
     @Test
     @DisplayName("Should return empty array for team with no members")
-    void shouldReturnEmptyArrayForTeamWithNoMembers() throws Exception {
-      mockMvc
-          .perform(get("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$", hasSize(0)));
+    void shouldReturnEmptyArrayForTeamWithNoMembers() {
+      mockMvcTester
+          .get()
+          .uri("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatusOk()
+          .bodyJson()
+          .extractingPath("$")
+          .asArray()
+          .isEmpty();
     }
 
     @Test
     @DisplayName("Should return empty array for non-existent team")
-    void shouldReturnEmptyArrayForNonExistentTeam() throws Exception {
-      mockMvc
-          .perform(get("/api/teams/{teamId}/members", NON_EXISTENT_TEAM_ID_UUID))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$", hasSize(0)));
+    void shouldReturnEmptyArrayForNonExistentTeam() {
+      mockMvcTester
+          .get()
+          .uri("/api/teams/{teamId}/members", NON_EXISTENT_TEAM_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatusOk()
+          .bodyJson()
+          .extractingPath("$")
+          .asArray()
+          .isEmpty();
     }
   }
 
@@ -77,18 +87,25 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
     void shouldAddUserToTeamWhenInputIsValid() throws Exception {
       final var addUserToTeam = new AddUserToTeam(SALES_TEAM_ID_UUID, NEW_USER_ID_UUID);
 
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
-          .andExpect(status().isCreated());
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(jsonMapper.writeValueAsString(addUserToTeam))
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.CREATED);
 
-      // Verify user is now in the team
-      mockMvc
-          .perform(get("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$", hasSize(1)));
+      mockMvcTester
+          .get()
+          .uri("/api/teams/{teamId}/members", SALES_TEAM_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatusOk()
+          .bodyJson()
+          .extractingPath("$")
+          .asArray()
+          .hasSize(1);
     }
 
     @Test
@@ -96,49 +113,53 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
     void shouldReturnBadRequestWhenUserIsAlreadyMember() throws Exception {
       final var addUserToTeam = new AddUserToTeam(EXISTING_TEAM_ID_UUID, EXISTING_USER_ID_UUID);
 
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
-          .andExpect(status().isBadRequest());
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(jsonMapper.writeValueAsString(addUserToTeam))
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     @DisplayName("Should return bad request when user ID is null")
-    void shouldReturnBadRequestWhenUserIdIsNull() throws Exception {
-      final String addUserJson = "{\"teamId\":\"" + EXISTING_TEAM_ID_UUID + "\",\"userId\":null}";
-
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(addUserJson))
-          .andExpect(status().isBadRequest());
+    void shouldReturnBadRequestWhenUserIdIsNull() {
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content("{\"teamId\":\"" + EXISTING_TEAM_ID_UUID + "\",\"userId\":null}")
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     @DisplayName("Should return bad request when team ID is null")
-    void shouldReturnBadRequestWhenTeamIdIsNull() throws Exception {
-      final String addUserJson = "{\"teamId\":null,\"userId\":\"" + NEW_USER_ID_UUID + "\"}";
-
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(addUserJson))
-          .andExpect(status().isBadRequest());
+    void shouldReturnBadRequestWhenTeamIdIsNull() {
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content("{\"teamId\":null,\"userId\":\"" + NEW_USER_ID_UUID + "\"}")
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
     @DisplayName("Should return bad request when JSON is malformed")
-    void shouldReturnBadRequestWhenJsonIsMalformed() throws Exception {
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content("{malformed json}"))
-          .andExpect(status().isBadRequest());
+    void shouldReturnBadRequestWhenJsonIsMalformed() {
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content("{malformed json}")
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -146,12 +167,14 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
     void shouldReturnBadRequestWhenUserDoesNotExist() throws Exception {
       final var addUserToTeam = new AddUserToTeam(EXISTING_TEAM_ID_UUID, NON_EXISTENT_USER_ID_UUID);
 
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
-          .andExpect(status().isBadRequest());
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(jsonMapper.writeValueAsString(addUserToTeam))
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
 
     @Test
@@ -159,12 +182,14 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
     void shouldReturnBadRequestWhenTeamDoesNotExist() throws Exception {
       final var addUserToTeam = new AddUserToTeam(NON_EXISTENT_TEAM_ID_UUID, NEW_USER_ID_UUID);
 
-      mockMvc
-          .perform(
-              post("/api/teams/{teamId}/members", NON_EXISTENT_TEAM_ID_UUID)
-                  .contentType(MediaType.APPLICATION_JSON)
-                  .content(jsonMapper.writeValueAsString(addUserToTeam)))
-          .andExpect(status().isBadRequest());
+      mockMvcTester
+          .post()
+          .uri("/api/teams/{teamId}/members", NON_EXISTENT_TEAM_ID_UUID)
+          .contentType(MediaType.APPLICATION_JSON)
+          .content(jsonMapper.writeValueAsString(addUserToTeam))
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.BAD_REQUEST);
     }
   }
 
@@ -174,56 +199,63 @@ class TeamMemberIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should remove user from team when user is a member")
-    void shouldRemoveUserFromTeamWhenUserIsMember() throws Exception {
-      mockMvc
-          .perform(
-              delete(
-                  "/api/teams/{teamId}/members/{userId}",
-                  EXISTING_TEAM_ID_UUID,
-                  EXISTING_USER_ID_UUID))
-          .andExpect(status().isNoContent());
+    void shouldRemoveUserFromTeamWhenUserIsMember() {
+      mockMvcTester
+          .delete()
+          .uri("/api/teams/{teamId}/members/{userId}", EXISTING_TEAM_ID_UUID, EXISTING_USER_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.NO_CONTENT);
 
-      // Verify user is no longer in the team
-      mockMvc
-          .perform(get("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID))
-          .andExpect(status().isOk())
-          .andExpect(jsonPath("$", hasSize(1)));
+      mockMvcTester
+          .get()
+          .uri("/api/teams/{teamId}/members", EXISTING_TEAM_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatusOk()
+          .bodyJson()
+          .extractingPath("$")
+          .asArray()
+          .hasSize(1);
     }
 
     @Test
     @DisplayName("Should return not found when user is not a member")
-    void shouldReturnNotFoundWhenUserIsNotMember() throws Exception {
-      mockMvc
-          .perform(
-              delete(
-                  "/api/teams/{teamId}/members/{userId}",
-                  SALES_TEAM_ID_UUID,
-                  EXISTING_USER_ID_UUID))
-          .andExpect(status().isNotFound());
+    void shouldReturnNotFoundWhenUserIsNotMember() {
+      mockMvcTester
+          .delete()
+          .uri("/api/teams/{teamId}/members/{userId}", SALES_TEAM_ID_UUID, EXISTING_USER_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("Should return not found when team does not exist")
-    void shouldReturnNotFoundWhenTeamDoesNotExist() throws Exception {
-      mockMvc
-          .perform(
-              delete(
-                  "/api/teams/{teamId}/members/{userId}",
-                  NON_EXISTENT_TEAM_ID_UUID,
-                  EXISTING_USER_ID_UUID))
-          .andExpect(status().isNotFound());
+    void shouldReturnNotFoundWhenTeamDoesNotExist() {
+      mockMvcTester
+          .delete()
+          .uri(
+              "/api/teams/{teamId}/members/{userId}",
+              NON_EXISTENT_TEAM_ID_UUID,
+              EXISTING_USER_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.NOT_FOUND);
     }
 
     @Test
     @DisplayName("Should return not found when user does not exist")
-    void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
-      mockMvc
-          .perform(
-              delete(
-                  "/api/teams/{teamId}/members/{userId}",
-                  EXISTING_TEAM_ID_UUID,
-                  NON_EXISTENT_USER_ID_UUID))
-          .andExpect(status().isNotFound());
+    void shouldReturnNotFoundWhenUserDoesNotExist() {
+      mockMvcTester
+          .delete()
+          .uri(
+              "/api/teams/{teamId}/members/{userId}",
+              EXISTING_TEAM_ID_UUID,
+              NON_EXISTENT_USER_ID_UUID)
+          .exchange()
+          .assertThat()
+          .hasStatus(HttpStatus.NOT_FOUND);
     }
   }
 }

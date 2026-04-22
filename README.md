@@ -79,7 +79,8 @@ com.lprevidente.ddd_example/
   translates `@AggregateRoot` → `@Entity`, `@ValueObject` → `@Embeddable`, `@Identity` → `@EmbeddedId`/`@Id` at
   compile time via ByteBuddy.
 - **`application/`** owns orchestration only, split by CQRS concern: `command/` + `handler/` for the write side,
-  `query/` (query services + read repositories) + `projection/` (`*View` interfaces) for the read side. No domain logic lives here.
+  `query/` (query services + read repositories) + `projection/` (`*View` interfaces) for the read side. No domain logic
+  lives here.
 - **`infrastructure/`** contains only framework adapters (`@RestController`). Controllers are package-private and inject
   handlers directly — no mediator or dispatcher.
 - **Cross-module access** goes exclusively through `user/api/` (the Modulith named interface). The `team` context never

@@ -24,6 +24,15 @@ create table if not exists team_members
     constraint fk_team_user foreign key (user_id) references users (id) on delete cascade
 );
 
+create table if not exists offices
+(
+    id      uuid not null primary key,
+    name    varchar(255),
+    address varchar(255),
+    city    varchar(255),
+    country varchar(255)
+);
+
 create table if not exists event_publication
 (
     completion_date  timestamp(6) with time zone,
