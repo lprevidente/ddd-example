@@ -14,10 +14,8 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(value = "/offices.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class OfficeIntegrationTest extends BaseIntegrationTest {
 
-  private static final UUID EXISTING_OFFICE_ID =
-      UUID.fromString("77777777-7777-7777-7777-777777777777");
-  private static final UUID NON_EXISTENT_OFFICE_ID =
-      UUID.fromString("99999999-9999-9999-9999-999999999999");
+  private static final UUID EXISTING_OFFICE_ID = UUID.fromString("77777777-7777-7777-7777-777777777777");
+  private static final UUID NON_EXISTENT_OFFICE_ID = UUID.fromString("99999999-9999-9999-9999-999999999999");
 
   @Nested
   @DisplayName("GET /api/v1/offices")

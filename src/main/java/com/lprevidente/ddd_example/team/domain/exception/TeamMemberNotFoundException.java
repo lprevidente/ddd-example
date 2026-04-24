@@ -3,6 +3,7 @@ package com.lprevidente.ddd_example.team.domain.exception;
 import com.lprevidente.ddd_example.common.exception.DomainException;
 import com.lprevidente.ddd_example.team.domain.TeamMemberId;
 import org.springframework.http.HttpStatus;
+import com.lprevidente.ddd_example.user.api.UserId;
 
 /** Exception thrown when a user cannot be found. */
 public class TeamMemberNotFoundException extends DomainException {

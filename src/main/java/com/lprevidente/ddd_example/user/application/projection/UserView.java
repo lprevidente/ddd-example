@@ -1,6 +1,6 @@
 package com.lprevidente.ddd_example.user.application.projection;
 
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import org.jmolecules.architecture.cqrs.QueryModel;
 
 @QueryModel

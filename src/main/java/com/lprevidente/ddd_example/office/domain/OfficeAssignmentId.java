@@ -1,4 +1,4 @@
-package com.lprevidente.ddd_example.team.domain;
+package com.lprevidente.ddd_example.office.domain;
 
 import com.lprevidente.ddd_example.common.identifier.Identifier;
 import java.io.Serializable;
@@ -7,9 +7,13 @@ import org.jmolecules.ddd.annotation.ValueObject;
 import org.springframework.util.Assert;
 
 @ValueObject
-public record UserId(UUID id) implements Serializable, Identifier {
+public record OfficeAssignmentId(UUID id) implements Identifier, Serializable {
 
-  public UserId {
+  public OfficeAssignmentId {
     Assert.notNull(id, "id must not be null");
+  }
+
+  public OfficeAssignmentId() {
+    this(UUID.randomUUID());
   }
 }

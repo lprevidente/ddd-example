@@ -2,7 +2,7 @@ package com.lprevidente.ddd_example.user.api;
 
 import com.lprevidente.ddd_example.user.application.query.UserReadRepository;
 import com.lprevidente.ddd_example.user.domain.Users;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;

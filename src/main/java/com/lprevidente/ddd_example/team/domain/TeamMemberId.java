@@ -7,6 +7,7 @@ import java.util.Objects;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.jmolecules.ddd.annotation.ValueObject;
+import com.lprevidente.ddd_example.user.api.UserId;
 
 /** Composite ID for TeamMembership consisting of teamId and userId */
 @Getter

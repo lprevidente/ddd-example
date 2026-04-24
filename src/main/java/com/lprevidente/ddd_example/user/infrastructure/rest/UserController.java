@@ -8,7 +8,7 @@ import com.lprevidente.ddd_example.user.application.projection.UserView;
 import com.lprevidente.ddd_example.user.application.handler.AddUserHandler;
 import com.lprevidente.ddd_example.user.application.handler.DeleteUserHandler;
 import com.lprevidente.ddd_example.user.application.handler.UpdateUserHandler;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import jakarta.validation.Valid;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;

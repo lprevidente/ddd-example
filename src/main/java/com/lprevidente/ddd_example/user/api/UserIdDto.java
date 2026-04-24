@@ -1,6 +1,6 @@
 package com.lprevidente.ddd_example.user.api;
 
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 
 public interface UserIdDto {
 

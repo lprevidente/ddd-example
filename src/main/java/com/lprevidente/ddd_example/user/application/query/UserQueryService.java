@@ -1,7 +1,7 @@
 package com.lprevidente.ddd_example.user.application.query;
 
 import com.lprevidente.ddd_example.user.application.projection.UserView;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import com.lprevidente.ddd_example.user.domain.exception.UserNotFoundException;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;

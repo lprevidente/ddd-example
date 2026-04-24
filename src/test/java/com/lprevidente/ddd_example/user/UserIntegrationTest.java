@@ -3,7 +3,7 @@ package com.lprevidente.ddd_example.user;
 import com.lprevidente.ddd_example.BaseIntegrationTest;
 import com.lprevidente.ddd_example.user.application.command.AddUser;
 import com.lprevidente.ddd_example.user.application.command.UpdateUser;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import java.util.UUID;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
@@ -15,10 +15,8 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(value = "/users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class UserIntegrationTest extends BaseIntegrationTest {
 
-  private static final UUID EXISTING_USER_ID_UUID =
-      UUID.fromString("11111111-1111-1111-1111-111111111111");
-  private static final UUID NON_EXISTENT_USER_ID_UUID =
-      UUID.fromString("99999999-9999-9999-9999-999999999999");
+  private static final UUID EXISTING_USER_ID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final UUID NON_EXISTENT_USER_ID_UUID = UUID.fromString("99999999-9999-9999-9999-999999999999");
 
   private static final UserId EXISTING_USER_ID = new UserId(EXISTING_USER_ID_UUID);
   private static final UserId NON_EXISTENT_USER_ID = new UserId(NON_EXISTENT_USER_ID_UUID);
@@ -92,7 +90,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should create user when input is valid")
-    void shouldCreateUserWhenInputIsValid() throws Exception {
+    void shouldCreateUserWhenInputIsValid() {
       final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
@@ -120,7 +118,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when firstName is blank")
-    void shouldReturnBadRequestWhenFirstNameIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenFirstNameIsBlank() {
       final var addUser = new AddUser("", "Neri", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
@@ -135,7 +133,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when lastName is blank")
-    void shouldReturnBadRequestWhenLastNameIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenLastNameIsBlank() {
       final var addUser = new AddUser("Paolo", "", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
@@ -150,7 +148,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when email is blank")
-    void shouldReturnBadRequestWhenEmailIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenEmailIsBlank() {
       final var addUser = new AddUser("Paolo", "Neri", "", "Password@123");
 
       mockMvcTester
@@ -165,7 +163,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when password is blank")
-    void shouldReturnBadRequestWhenPasswordIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenPasswordIsBlank() {
       final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "");
 
       mockMvcTester
@@ -180,7 +178,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when password is too weak")
-    void shouldReturnBadRequestWhenPasswordIsTooWeak() throws Exception {
+    void shouldReturnBadRequestWhenPasswordIsTooWeak() {
       final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "weak");
 
       mockMvcTester
@@ -195,7 +193,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return conflict when email already exists")
-    void shouldReturnBadRequestWhenEmailAlreadyExists() throws Exception {
+    void shouldReturnBadRequestWhenEmailAlreadyExists() {
       final var addUser =
           new AddUser("Duplicate", "User", "mario.rossi@example.com", "Password@123");
 
@@ -233,7 +231,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should update user when input is valid")
-    void shouldUpdateUserWhenInputIsValid() throws Exception {
+    void shouldUpdateUserWhenInputIsValid() {
       final var updateUser =
           new UpdateUser(EXISTING_USER_ID, "Mario Aggiornato", "Rossi Aggiornato");
 
@@ -260,7 +258,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return 404 when user does not exist")
-    void shouldReturnNotFoundWhenUserDoesNotExist() throws Exception {
+    void shouldReturnNotFoundWhenUserDoesNotExist() {
       final var updateUser = new UpdateUser(NON_EXISTENT_USER_ID, "Nome", "Cognome");
 
       mockMvcTester
@@ -275,7 +273,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when firstName is blank")
-    void shouldReturnBadRequestWhenFirstNameIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenFirstNameIsBlank() {
       final var updateUser = new UpdateUser(EXISTING_USER_ID, "", "Rossi");
 
       mockMvcTester
@@ -290,7 +288,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when lastName is blank")
-    void shouldReturnBadRequestWhenLastNameIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenLastNameIsBlank() {
       final var updateUser = new UpdateUser(EXISTING_USER_ID, "Mario", "");
 
       mockMvcTester

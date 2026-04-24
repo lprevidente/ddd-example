@@ -9,6 +9,7 @@ import lombok.Getter;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 import org.springframework.util.Assert;
+import com.lprevidente.ddd_example.user.api.UserId;
 
 @Getter
 @AggregateRoot

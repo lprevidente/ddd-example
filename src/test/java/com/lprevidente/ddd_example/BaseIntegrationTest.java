@@ -12,7 +12,6 @@ import tools.jackson.databind.json.JsonMapper;
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 public abstract class BaseIntegrationTest {
-  @Autowired protected MockMvc mockMvc;
   @Autowired protected MockMvcTester mockMvcTester;
   @Autowired protected JsonMapper jsonMapper;
 }

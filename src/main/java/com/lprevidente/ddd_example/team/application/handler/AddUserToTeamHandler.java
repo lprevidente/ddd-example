@@ -6,6 +6,7 @@ import com.lprevidente.ddd_example.user.api.UserApi;
 import lombok.RequiredArgsConstructor;
 import org.jmolecules.architecture.cqrs.CommandHandler;
 import org.jmolecules.ddd.annotation.Service;
+import com.lprevidente.ddd_example.user.api.UserId;
 
 @Service
 @RequiredArgsConstructor

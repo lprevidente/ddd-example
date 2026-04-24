@@ -13,10 +13,8 @@ import org.springframework.test.context.jdbc.Sql;
 @Sql(value = "/team.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class TeamIntegrationTest extends BaseIntegrationTest {
 
-  private static final UUID EXISTING_TEAM_ID_UUID =
-      UUID.fromString("44444444-4444-4444-4444-444444444444");
-  private static final UUID NON_EXISTENT_TEAM_ID_UUID =
-      UUID.fromString("99999999-9999-9999-9999-999999999999");
+  private static final UUID EXISTING_TEAM_ID_UUID = UUID.fromString("44444444-4444-4444-4444-444444444444");
+  private static final UUID NON_EXISTENT_TEAM_ID_UUID = UUID.fromString("99999999-9999-9999-9999-999999999999");
 
   @Nested
   @DisplayName("GET /api/v1/teams")
@@ -45,7 +43,7 @@ class TeamIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should create team when input is valid")
-    void shouldCreateTeamWhenInputIsValid() throws Exception {
+    void shouldCreateTeamWhenInputIsValid() {
       final var createTeam = new CreateTeam("QA Team");
 
       mockMvcTester
@@ -73,7 +71,7 @@ class TeamIntegrationTest extends BaseIntegrationTest {
 
     @Test
     @DisplayName("Should return bad request when name is blank")
-    void shouldReturnBadRequestWhenNameIsBlank() throws Exception {
+    void shouldReturnBadRequestWhenNameIsBlank()  {
       final var createTeam = new CreateTeam("");
 
       mockMvcTester

@@ -1,7 +1,7 @@
 package com.lprevidente.ddd_example.team.application.command;
 
 import com.lprevidente.ddd_example.team.domain.TeamId;
-import com.lprevidente.ddd_example.team.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import jakarta.validation.constraints.NotNull;
 import org.jmolecules.architecture.cqrs.Command;
 

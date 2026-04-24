@@ -4,7 +4,7 @@ import com.lprevidente.ddd_example.team.application.projection.MemberView;
 import com.lprevidente.ddd_example.team.application.projection.TeamMemberView;
 import com.lprevidente.ddd_example.team.domain.TeamId;
 import com.lprevidente.ddd_example.team.domain.TeamMemberId;
-import com.lprevidente.ddd_example.team.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import com.lprevidente.ddd_example.user.api.UserApi;
 import java.util.Collection;
 import java.util.stream.Collectors;

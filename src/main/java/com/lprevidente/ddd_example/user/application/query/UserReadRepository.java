@@ -1,7 +1,7 @@
 package com.lprevidente.ddd_example.user.application.query;
 
 import com.lprevidente.ddd_example.user.domain.User;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

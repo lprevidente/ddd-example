@@ -33,6 +33,16 @@ create table if not exists offices
     country varchar(255)
 );
 
+create table if not exists office_assignments
+(
+    id            uuid      not null primary key,
+    office_id     uuid      not null,
+    user_id       uuid      not null,
+    assigned_at   timestamp not null,
+    unassigned_at timestamp,
+    constraint fk_office_assignment_office foreign key (office_id) references offices (id) on delete cascade
+);
+
 create table if not exists event_publication
 (
     completion_date  timestamp(6) with time zone,

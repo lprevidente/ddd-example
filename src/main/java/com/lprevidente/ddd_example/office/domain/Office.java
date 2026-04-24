@@ -2,7 +2,10 @@ package com.lprevidente.ddd_example.office.domain;
 
 import jakarta.persistence.Table;
 import java.util.Objects;
+
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.jmolecules.ddd.annotation.AggregateRoot;
 import org.jmolecules.ddd.annotation.Identity;
 import org.springframework.util.Assert;
@@ -10,6 +13,7 @@ import org.springframework.util.Assert;
 @Getter
 @AggregateRoot
 @Table(name = "offices")
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Office {
 
   @Identity private OfficeId id;
@@ -17,8 +21,6 @@ public class Office {
   private String name;
 
   private Address address;
-
-  protected Office() {}
 
   public Office(String name, Address address) {
     Assert.notNull(name, "name must not be null");

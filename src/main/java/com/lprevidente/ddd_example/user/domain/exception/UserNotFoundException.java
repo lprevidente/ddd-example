@@ -1,7 +1,7 @@
 package com.lprevidente.ddd_example.user.domain.exception;
 
 import com.lprevidente.ddd_example.common.exception.DomainException;
-import com.lprevidente.ddd_example.user.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import org.springframework.http.HttpStatus;
 
 /** Exception thrown when a user cannot be found. */

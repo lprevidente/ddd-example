@@ -7,7 +7,7 @@ import com.lprevidente.ddd_example.team.application.projection.TeamMemberView;
 import com.lprevidente.ddd_example.team.application.handler.AddUserToTeamHandler;
 import com.lprevidente.ddd_example.team.application.handler.RemoveUserFromTeamHandler;
 import com.lprevidente.ddd_example.team.domain.TeamId;
-import com.lprevidente.ddd_example.team.domain.UserId;
+import com.lprevidente.ddd_example.user.api.UserId;
 import jakarta.validation.Valid;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;

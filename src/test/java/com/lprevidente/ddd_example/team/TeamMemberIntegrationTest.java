@@ -15,18 +15,12 @@ import org.springframework.test.context.jdbc.Sql;
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class TeamMemberIntegrationTest extends BaseIntegrationTest {
 
-  private static final UUID EXISTING_TEAM_ID_UUID =
-      UUID.fromString("44444444-4444-4444-4444-444444444444");
-  private static final UUID SALES_TEAM_ID_UUID =
-      UUID.fromString("66666666-6666-6666-6666-666666666666");
-  private static final UUID NON_EXISTENT_TEAM_ID_UUID =
-      UUID.fromString("99999999-9999-9999-9999-999999999999");
-  private static final UUID EXISTING_USER_ID_UUID =
-      UUID.fromString("11111111-1111-1111-1111-111111111111");
-  private static final UUID NEW_USER_ID_UUID =
-      UUID.fromString("33333333-3333-3333-3333-333333333333");
-  private static final UUID NON_EXISTENT_USER_ID_UUID =
-      UUID.fromString("88888888-8888-8888-8888-888888888888");
+  private static final UUID EXISTING_TEAM_ID_UUID = UUID.fromString("44444444-4444-4444-4444-444444444444");
+  private static final UUID SALES_TEAM_ID_UUID = UUID.fromString("66666666-6666-6666-6666-666666666666");
+  private static final UUID NON_EXISTENT_TEAM_ID_UUID = UUID.fromString("99999999-9999-9999-9999-999999999999");
+  private static final UUID EXISTING_USER_ID_UUID = UUID.fromString("11111111-1111-1111-1111-111111111111");
+  private static final UUID NEW_USER_ID_UUID = UUID.fromString("33333333-3333-3333-3333-333333333333");
+  private static final UUID NON_EXISTENT_USER_ID_UUID = UUID.fromString("88888888-8888-8888-8888-888888888888");
 
   @Nested
   @DisplayName("GET /api/teams/{teamId}/members")
