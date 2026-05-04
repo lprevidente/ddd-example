@@ -11,10 +11,10 @@
   </parent>
 
   <groupId>com.lprevidente</groupId>
-  <artifactId>ddd-example</artifactId>
+  <artifactId>orgcraft</artifactId>
   <version>0.0.1</version>
-  <name>ddd-example</name>
-  <description>DDD project for Spring Boot</description>
+  <name>orgcraft</name>
+  <description>DDD/CQRS organization-management example</description>
 
   <properties>
     <java.version>25</java.version>

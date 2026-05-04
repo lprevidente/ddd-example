@@ -1,6 +1,6 @@
 spring:
   application:
-    name: ddd-example
+    name: orgcraft
   # JPA
   jpa:
     hibernate:

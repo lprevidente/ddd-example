@@ -1,4 +1,4 @@
-# DDD Example Application
+# Orgcraft
 
 [![Run Tests](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml/badge.svg)](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml)
 
@@ -32,7 +32,7 @@ follows the same internal
 layout:
 
 ```
-com.lprevidente.ddd_example/
+com.lprevidente.orgcraft/
 ├── Application.java
 ├── config/                          # Cross-cutting framework config (security, error handling)
 ├── common/                          # Shared kernel (base types, identifier abstraction)

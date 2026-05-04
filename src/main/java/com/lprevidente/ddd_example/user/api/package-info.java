@@ -1,6 +1,0 @@
-@NullMarked
-@NamedInterface("api-user")
-package com.lprevidente.ddd_example.user.api;
-
-import org.jspecify.annotations.NullMarked;
-import org.springframework.modulith.NamedInterface;
