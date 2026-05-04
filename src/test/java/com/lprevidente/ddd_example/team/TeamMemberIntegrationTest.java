@@ -8,8 +8,10 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.jdbc.Sql;
 
+@WithMockUser
 @Sql(
     value = {"/users.sql", "/team.sql", "/team_members.sql"},
     executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)

@@ -1,55 +1,25 @@
-create table if not exists users
+create table if not exists spring_session
 (
-    id         uuid not null primary key,
-    email      character varying(255) unique,
-    first_name character varying(255),
-    last_name  character varying(255),
-    password   character varying(255)
-);
+    primary_id            char(36) not null,
+    session_id            char(36) not null,
+    creation_time         bigint   not null,
+    last_access_time      bigint   not null,
+    max_inactive_interval int      not null,
+    expiry_time           bigint   not null,
+    principal_name        varchar(100),
+    constraint spring_session_pk primary key (primary_id)
+    );
 
-create table if not exists teams
-(
-    id         uuid not null primary key,
-    created_at timestamp,
-    name       varchar(255)
-);
+create unique index if not exists spring_session_ix1 on spring_session (session_id);
+create index if not exists spring_session_ix2 on spring_session (expiry_time);
+create index if not exists spring_session_ix3 on spring_session (principal_name);
 
-create table if not exists team_members
+create table if not exists spring_session_attributes
 (
-    user_id   uuid not null,
-    team_id   uuid not null,
-    joined_at timestamp,
-    constraint pk_team_members primary key (user_id, team_id),
-    constraint fk_user_team foreign key (team_id) references teams (id) on delete cascade,
-    constraint fk_team_user foreign key (user_id) references users (id) on delete cascade
-);
-
-create table if not exists offices
-(
-    id      uuid not null primary key,
-    name    varchar(255),
-    address varchar(255),
-    city    varchar(255),
-    country varchar(255)
-);
-
-create table if not exists office_assignments
-(
-    id            uuid      not null primary key,
-    office_id     uuid      not null,
-    user_id       uuid      not null,
-    assigned_at   timestamp not null,
-    unassigned_at timestamp,
-    constraint fk_office_assignment_office foreign key (office_id) references offices (id) on delete cascade
-);
-
-create table if not exists event_publication
-(
-    completion_date  timestamp(6) with time zone,
-    publication_date timestamp(6) with time zone,
-    id               uuid not null,
-    event_type       varchar(255),
-    listener_id      varchar(255),
-    serialized_event varchar(255),
-    primary key (id)
+    session_primary_id char(36)     not null,
+    attribute_name     varchar(200) not null,
+    attribute_bytes    bytea        not null,
+    constraint spring_session_attributes_pk primary key (session_primary_id, attribute_name),
+    constraint spring_session_attributes_fk foreign key (session_primary_id)
+    references spring_session (primary_id) on delete cascade
 );

@@ -1,0 +1,71 @@
+package com.lprevidente.ddd_example.security;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.crypto.factory.PasswordEncoderFactories;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.session.jdbc.config.annotation.web.http.EnableJdbcHttpSession;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.time.Duration;
+
+@Configuration
+@EnableJdbcHttpSession
+class SecurityConfig {
+
+	@Bean
+	SecurityFilterChain securityFilterChain(HttpSecurity http, AuthHandler authHandler) {
+		return http
+				.securityMatcher("/**")
+				.csrf(AbstractHttpConfigurer::disable)
+				.formLogin(l -> l.usernameParameter("email").successHandler(authHandler).failureHandler(authHandler))
+				.exceptionHandling(e -> e.authenticationEntryPoint(authHandler))
+				.authorizeHttpRequests(authorize -> authorize
+						.requestMatchers(HttpMethod.OPTIONS, "/**")
+						.permitAll()
+						.anyRequest()
+						.authenticated())
+				.build();
+	}
+
+	@Bean
+	public UserDetailsService userDetailsService() {
+		final var admin = User
+				.builder()
+				.username("admin")
+				.password(passwordEncoder().encode("admin"))
+				.roles("ADMIN")
+				.build();
+
+		return new InMemoryUserDetailsManager(admin);
+	}
+
+	@Bean
+	CorsConfigurationSource corsConfigurationSource() {
+		final var source = new UrlBasedCorsConfigurationSource();
+		final var config = new CorsConfiguration();
+		config.addAllowedHeader("*");
+		config.addAllowedMethod("*");
+		config.addAllowedOriginPattern("*");
+		config.setAllowCredentials(true);
+		config.applyPermitDefaultValues();
+		config.setMaxAge(Duration.ofDays(1));
+		source.registerCorsConfiguration("/**", config);
+		return source;
+	}
+
+	@Bean
+	PasswordEncoder passwordEncoder() {
+		return PasswordEncoderFactories.createDelegatingPasswordEncoder();
+	}
+
+}
