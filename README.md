@@ -2,7 +2,8 @@
 
 [![Run Tests](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml/badge.svg)](https://github.com/lprevidente/ddd-example/actions/workflows/run-tests.yml)
 
-A Spring Boot application exploring Domain-Driven Design (DDD) and CQRS with a toy team-management domain. The point is
+A Spring Boot application exploring Domain-Driven Design (DDD) and CQRS with a toy team-management
+domain. The point is
 the **shape of the code**, not the feature set.
 
 > **Note**: This is a learning project. Feedback and suggestions are welcome.
@@ -26,78 +27,59 @@ the **shape of the code**, not the feature set.
 
 ## Package Structure
 
+The codebase is organized around **bounded contexts**. Each context is a top-level package and
+follows the same internal
+layout:
+
 ```
 com.lprevidente.ddd_example/
 ├── Application.java
-├── config/                          # SecurityConfig + GlobalExceptionHandler (RFC 7807)
-├── common/
-│   ├── exception/                   # DomainException base (named interface)
-│   └── identifier/                  # Identifier<UUID> + Jackson/Spring converters (named interface)
-├── user/                            # Bounded context: User
-│   ├── api/                         # Named interface exposed to other modules
-│   │   ├── UserApi.java
-│   │   └── UserIdDto.java
-│   ├── application/
-│   │   ├── command/                 # AddUser, UpdateUser, DeleteUser
-│   │   ├── handler/                 # One handler per command
-│   │   ├── query/                   # UserQueryService + UserReadRepository (read side)
-│   │   └── projection/              # UserView (Spring Data projection interface)
-│   ├── domain/
-│   │   ├── User.java                # Aggregate root
-│   │   ├── UserId.java              # Value object
-│   │   ├── Email.java               # Value object
-│   │   ├── Password.java            # Value object
-│   │   ├── Users.java               # Repository interface
-│   │   └── exception/
-│   └── infrastructure/rest/
-│       └── UserController.java
-└── team/                            # Bounded context: Team
+├── config/                          # Cross-cutting framework config (security, error handling)
+├── common/                          # Shared kernel (base types, identifier abstraction)
+└── <bounded-context>/
+    ├── api/                         # Named interface exposed to other modules (optional)
     ├── application/
-    │   ├── command/                 # CreateTeam, DeleteTeam, AddUserToTeam, RemoveUserFromTeam
-    │   ├── handler/                 # One handler per command
-    │   ├── query/                   # TeamQueryService, TeamMemberQueryService + read repositories
-    │   └── projection/              # TeamView, TeamMemberView, MemberView
-    ├── domain/
-    │   ├── Team.java                # Aggregate root
-    │   ├── TeamId.java              # Value object
-    │   ├── TeamMember.java          # Aggregate root
-    │   ├── TeamMemberId.java        # Value object (composite: TeamId + UserId)
-    │   ├── UserId.java              # Local copy — intentionally separate from user.domain.UserId
-    │   ├── Teams.java               # Repository interface
-    │   ├── TeamMembers.java         # Repository interface
-    │   ├── event/
-    │   │   └── TeamCreated.java     # Domain event
-    │   └── exception/
-    └── infrastructure/rest/
-        ├── TeamController.java
-        └── TeamMemberController.java
+    │   ├── command/                 # Command records (write side)
+    │   ├── handler/                 # Command handlers (one per command)
+    │   ├── query/                   # Query services + read repositories
+    │   └── projection/              # *View projection interfaces
+    ├── domain/                      # Aggregates, value objects, repositories, events, exceptions
+    └── infrastructure/              # Framework adapters (REST controllers, etc.)
 ```
 
 ### Key structural rules
 
-- **`domain/`** is persistence-ignorant. No `@Entity`, `@Embeddable`, or `@Id` are hand-written — `jmolecules-jpa`
-  translates `@AggregateRoot` → `@Entity`, `@ValueObject` → `@Embeddable`, `@Identity` → `@EmbeddedId`/`@Id` at
+- **`domain/`** is persistence-ignorant. No `@Entity`, `@Embeddable`, or `@Id` are hand-written —
+  `jmolecules-jpa`
+  translates `@AggregateRoot` → `@Entity`, `@ValueObject` → `@Embeddable`, `@Identity` →
+  `@EmbeddedId`/`@Id` at
   compile time via ByteBuddy.
-- **`application/`** owns orchestration only, split by CQRS concern: `command/` + `handler/` for the write side,
-  `query/` (query services + read repositories) + `projection/` (`*View` interfaces) for the read side. No domain logic
+- **`application/`** owns orchestration only, split by CQRS concern: `command/` + `handler/` for the
+  write side,
+  `query/` (query services + read repositories) + `projection/` (`*View` interfaces) for the read
+  side. No domain logic
   lives here.
-- **`infrastructure/`** contains only framework adapters (`@RestController`). Controllers are package-private and inject
+- **`infrastructure/`** contains only framework adapters (`@RestController`). Controllers are
+  package-private and inject
   handlers directly — no mediator or dispatcher.
-- **Cross-module access** goes exclusively through `user/api/` (the Modulith named interface). The `team` context never
-  touches `user.domain`.
+- **Cross-module access** goes exclusively through a context's `api/` package (a Modulith named
+  interface). Other
+  contexts never reach into another's `domain/`.
 
 ---
 
 ## CQRS Write Side
 
-Commands are plain records in `application/command/` annotated with `@Command`. Each command has exactly one handler in
+Commands are plain records in `application/command/` annotated with `@Command`. Each command has
+exactly one handler in
 `application/handler/` annotated with `@Service`:
 
 ```
 Controller  →  Handler.handle(command)  →  Domain aggregate  →  Repository
 ```
 
-No mediator. Controllers inject the specific handler they need. The handler's `handle()` method is annotated
+No mediator. Controllers inject the specific handler they need. The handler's `handle()` method is
+annotated
 `@CommandHandler` (jMolecules).
 
 **Example flow — create a team:**
@@ -115,9 +97,11 @@ POST /api/v1/teams
 Reads never go through a command handler. The read side is fully separated from the write side:
 
 - **Domain repositories** (`domain/`) have no projection methods — write operations only
-- **Read repositories** (`application/query/`) extend Spring Data's `Repository<T,ID>` marker and expose only
+- **Read repositories** (`application/query/`) extend Spring Data's `Repository<T,ID>` marker and
+  expose only
   projection queries
-- **Query services** (`application/query/`) return `*View` projection interfaces — no aggregates leak out
+- **Query services** (`application/query/`) return `*View` projection interfaces — no aggregates
+  leak out
 
 ```
 Controller  →  QueryService  →  ReadRepository.findXxx(Class<T>)  →  *View projection
@@ -134,34 +118,40 @@ MemberView.class)` to hydrate user data from the user module.
 
 - Annotated `@AggregateRoot` (jMolecules); `@Entity` added by transformer
 - Protected no-arg constructor for Hibernate
-- **Invariants are enforced in the constructor** — repositories and cross-module APIs are passed in so the aggregate can
-  validate itself at creation time:
-    - `new User(firstName, lastName, password, email, users)` — checks email uniqueness
-    - `new TeamMember(teamId, userId, teams, users, teamMembers)` — checks team/user existence + no duplicate membership
+- **Invariants are enforced in the constructor** — repositories and cross-module APIs are passed in
+  so the aggregate can
+  validate itself at creation time (e.g. checking uniqueness of a natural key, or verifying that a
+  referenced entity in
+  another context actually exists before establishing the relationship).
 
 ### Value Objects
 
-- Records implementing `Identifier<UUID>` for IDs (`UserId`, `TeamId`, `TeamMemberId`)
+- Records implementing `Identifier<UUID>` for typed IDs
 - Annotated `@ValueObject` (jMolecules); `@Embeddable` added by transformer
-- Compact constructors enforce invariants (`Email` validates format, `Password` enforces strength rules)
+- Compact constructors enforce invariants (e.g. format validation, strength or range rules)
 
 ### Domain Events
 
-- `Team` extends `AbstractAggregateRoot<Team>` and registers `TeamCreated` on construction
+- Aggregates extend `AbstractAggregateRoot<T>` and register events from their constructor or domain
+  methods
 - Published automatically by Spring Data on `save()`
 
 ### Modulith boundaries
 
-- `user/api/` is declared as a named interface — the only package other modules may import from `user`
+- `user/api/` is declared as a named interface — the only package other modules may import from
+  `user`
 - `common/identifier/` is a named interface shared across all modules
-- `VeryModulithTest` verifies boundaries at test time via `ApplicationModules.of(Application.class).verify()`
-- `DddRulesTest` runs `JMoleculesDddRules.all()` (ArchUnit) to verify aggregate/entity/value-object rules
+- `VeryModulithTest` verifies boundaries at test time via
+  `ApplicationModules.of(Application.class).verify()`
+- `DddRulesTest` runs `JMoleculesDddRules.all()` (ArchUnit) to verify aggregate/entity/value-object
+  rules
 
 ---
 
 ## JPA Without JPA Annotations
 
-The domain model is kept free of persistence annotations. The `byte-buddy-maven-plugin` runs `JMoleculesPlugin` at
+The domain model is kept free of persistence annotations. The `byte-buddy-maven-plugin` runs
+`JMoleculesPlugin` at
 `process-classes` and rewrites bytecode:
 
 | Source annotation                     | Added by transformer                  |
@@ -174,19 +164,10 @@ The domain model is kept free of persistence annotations. The `byte-buddy-maven-
 | `@Repository` (jMolecules)            | `@Repository` (Spring)                |
 | `@Service` (jMolecules)               | `@Service` (Spring)                   |
 
-Source classes only carry what the transformer can't derive: `@Table`, `@AttributeOverride`, `@Column`.
+Source classes only carry what the transformer can't derive: `@Table`, `@AttributeOverride`,
+`@Column`.
 
 To inspect the result: `javap -v -p target/classes/.../User.class`
-
----
-
-## API Endpoints
-
-- **Users** `POST /api/v1/users` — register; `GET /api/v1/users[/{id}]` — list/get; `PUT /{id}` — update;
-  `DELETE /{id}` — delete
-- **Teams** `POST /api/v1/teams` — create; `GET /api/v1/teams[/{id}]` — list/get; `DELETE /{id}` — delete
-- **Members** `POST /api/teams/{teamId}/members` — add user; `GET /members` — list;
-  `DELETE /members/{userId}` — remove
 
 ---
 
@@ -197,12 +178,12 @@ To inspect the result: `javap -v -p target/classes/.../User.class`
 ```bash
 ./mvnw spring-boot:run          # starts app + Postgres via Docker Compose
 ./mvnw test                     # run all tests (H2)
-./mvnw test -Dtest=TeamIntegrationTest
 ```
 
 ---
 
 ## Learning & Contributions
 
-If you have suggestions or see opportunities for better applying DDD concepts, feel free to open an issue or a pull
+If you have suggestions or see opportunities for better applying DDD concepts, feel free to open an
+issue or a pull
 request.
