@@ -5,6 +5,7 @@ import com.lprevidente.orgcraft.office.domain.OfficeId;
 import com.lprevidente.orgcraft.user.api.UserId;
 import java.time.Instant;
 import org.jmolecules.architecture.cqrs.QueryModel;
+import org.jspecify.annotations.Nullable;
 
 @QueryModel
 public interface OfficeAssignmentView {
@@ -16,5 +17,5 @@ public interface OfficeAssignmentView {
 
   Instant getAssignedAt();
 
-  Instant getUnassignedAt();
+  @Nullable Instant getUnassignedAt();
 }
