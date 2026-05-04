@@ -6,8 +6,13 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.jdbc.Sql;
 
+@Sql(value = "/users.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_CLASS)
 class SecurityConfigIntegrationTest extends BaseIntegrationTest {
+
+  private static final String EMAIL = "mario.rossi@example.com";
+  private static final String PASSWORD = "Test@1234";
 
   @Nested
   @DisplayName("Unauthenticated access")
@@ -67,8 +72,8 @@ class SecurityConfigIntegrationTest extends BaseIntegrationTest {
           .post()
           .uri("/login")
           .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-          .param("email", "admin")
-          .param("password", "admin")
+          .param("email", EMAIL)
+          .param("password", PASSWORD)
           .exchange()
           .assertThat()
           .hasStatusOk()
@@ -86,7 +91,7 @@ class SecurityConfigIntegrationTest extends BaseIntegrationTest {
           .post()
           .uri("/login")
           .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-          .param("email", "admin")
+          .param("email", EMAIL)
           .param("password", "wrong-password")
           .exchange()
           .assertThat()
@@ -104,8 +109,8 @@ class SecurityConfigIntegrationTest extends BaseIntegrationTest {
           .post()
           .uri("/login")
           .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-          .param("email", "ghost")
-          .param("password", "admin")
+          .param("email", "ghost@example.com")
+          .param("password", PASSWORD)
           .exchange()
           .assertThat()
           .hasStatus(HttpStatus.UNAUTHORIZED)
@@ -122,8 +127,8 @@ class SecurityConfigIntegrationTest extends BaseIntegrationTest {
           .post()
           .uri("/login")
           .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-          .param("username", "admin")
-          .param("password", "admin")
+          .param("username", EMAIL)
+          .param("password", PASSWORD)
           .exchange()
           .assertThat()
           .hasStatus(HttpStatus.UNAUTHORIZED);
@@ -136,8 +141,8 @@ class SecurityConfigIntegrationTest extends BaseIntegrationTest {
           .post()
           .uri("/login")
           .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-          .param("email", "admin")
-          .param("password", "admin")
+          .param("email", EMAIL)
+          .param("password", PASSWORD)
           .exchange()
           .assertThat()
           .hasStatusOk();

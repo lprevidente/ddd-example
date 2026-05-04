@@ -20,11 +20,6 @@ public record Password(String hashedValue) {
     return new Password(hashedPassword);
   }
 
-  /* Factory method for reconstituting from persistence */
-  public static Password fromHashed(String hashedPassword) {
-    return new Password(hashedPassword);
-  }
-
   private static void validatePasswordStrength(String password) {
     Assert.hasText(password, "Password cannot be empty");
     Assert.isTrue(password.length() >= 8, "Password must be at least 8 characters long");
@@ -43,12 +38,6 @@ public record Password(String hashedValue) {
 
   private static String hashPassword(String plainTextPassword) {
     return BCrypt.hashpw(plainTextPassword, BCrypt.gensalt(12));
-  }
-
-  // Verify if a plain text password matches this password
-  public boolean matches(String plainTextPassword) {
-    Assert.hasText(plainTextPassword, "Plain text password cannot be empty");
-    return BCrypt.checkpw(plainTextPassword, this.hashedValue());
   }
 
   // Override toString to avoid exposing hash in logs

@@ -1,7 +1,7 @@
 package com.lprevidente.orgcraft.user;
 
 import com.lprevidente.orgcraft.BaseIntegrationTest;
-import com.lprevidente.orgcraft.user.application.command.AddUser;
+import com.lprevidente.orgcraft.user.application.command.CreateUserReq;
 import com.lprevidente.orgcraft.user.application.command.UpdateUser;
 import com.lprevidente.orgcraft.user.api.UserId;
 import java.util.UUID;
@@ -93,7 +93,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should create user when input is valid")
     void shouldCreateUserWhenInputIsValid() {
-      final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "Password@123");
+      final var addUser = new CreateUserReq("Paolo", "Neri", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
           .post()
@@ -121,7 +121,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should return bad request when firstName is blank")
     void shouldReturnBadRequestWhenFirstNameIsBlank() {
-      final var addUser = new AddUser("", "Neri", "paolo.neri@example.com", "Password@123");
+      final var addUser = new CreateUserReq("", "Neri", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
           .post()
@@ -136,7 +136,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should return bad request when lastName is blank")
     void shouldReturnBadRequestWhenLastNameIsBlank() {
-      final var addUser = new AddUser("Paolo", "", "paolo.neri@example.com", "Password@123");
+      final var addUser = new CreateUserReq("Paolo", "", "paolo.neri@example.com", "Password@123");
 
       mockMvcTester
           .post()
@@ -151,7 +151,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should return bad request when email is blank")
     void shouldReturnBadRequestWhenEmailIsBlank() {
-      final var addUser = new AddUser("Paolo", "Neri", "", "Password@123");
+      final var addUser = new CreateUserReq("Paolo", "Neri", "", "Password@123");
 
       mockMvcTester
           .post()
@@ -166,7 +166,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should return bad request when password is blank")
     void shouldReturnBadRequestWhenPasswordIsBlank() {
-      final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "");
+      final var addUser = new CreateUserReq("Paolo", "Neri", "paolo.neri@example.com", "");
 
       mockMvcTester
           .post()
@@ -181,7 +181,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @Test
     @DisplayName("Should return bad request when password is too weak")
     void shouldReturnBadRequestWhenPasswordIsTooWeak() {
-      final var addUser = new AddUser("Paolo", "Neri", "paolo.neri@example.com", "weak");
+      final var addUser = new CreateUserReq("Paolo", "Neri", "paolo.neri@example.com", "weak");
 
       mockMvcTester
           .post()
@@ -197,7 +197,7 @@ class UserIntegrationTest extends BaseIntegrationTest {
     @DisplayName("Should return conflict when email already exists")
     void shouldReturnBadRequestWhenEmailAlreadyExists() {
       final var addUser =
-          new AddUser("Duplicate", "User", "mario.rossi@example.com", "Password@123");
+          new CreateUserReq("Duplicate", "User", "mario.rossi@example.com", "Password@123");
 
       mockMvcTester
           .post()

@@ -1,14 +1,15 @@
 package com.lprevidente.orgcraft.user.infrastructure.rest;
 
-import com.lprevidente.orgcraft.user.application.query.UserQueryService;
-import com.lprevidente.orgcraft.user.application.command.AddUser;
+import com.lprevidente.orgcraft.user.api.UserId;
+import com.lprevidente.orgcraft.user.application.command.CreateUserReq;
+import com.lprevidente.orgcraft.user.application.command.CreateUserRes;
 import com.lprevidente.orgcraft.user.application.command.DeleteUser;
 import com.lprevidente.orgcraft.user.application.command.UpdateUser;
-import com.lprevidente.orgcraft.user.application.projection.UserView;
 import com.lprevidente.orgcraft.user.application.handler.AddUserHandler;
 import com.lprevidente.orgcraft.user.application.handler.DeleteUserHandler;
 import com.lprevidente.orgcraft.user.application.handler.UpdateUserHandler;
-import com.lprevidente.orgcraft.user.api.UserId;
+import com.lprevidente.orgcraft.user.application.projection.UserView;
+import com.lprevidente.orgcraft.user.application.query.UserQueryService;
 import jakarta.validation.Valid;
 import java.util.Collection;
 import lombok.RequiredArgsConstructor;
@@ -36,7 +37,7 @@ class UserController {
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
-  UserId createUser(@RequestBody @Valid AddUser command) {
+  CreateUserRes createUser(@RequestBody @Valid CreateUserReq command) {
     return addUserHandler.handle(command);
   }
 

@@ -16,3 +16,12 @@ spring:
   sql:
     init:
       mode: always
+
+  # Virtual Threads
+  threads:
+    virtual:
+      enabled: true
+
+logging:
+  level:
+    org.springframework.security: TRACE

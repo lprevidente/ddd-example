@@ -1,5 +1,6 @@
 package com.lprevidente.orgcraft.user.application.query;
 
+import com.lprevidente.orgcraft.user.domain.Email;
 import com.lprevidente.orgcraft.user.domain.User;
 import com.lprevidente.orgcraft.user.api.UserId;
 import java.util.Collection;
@@ -16,4 +17,6 @@ public interface UserReadRepository extends Repository<User, UserId> {
   <T> List<T> findAllByIdIn(Collection<UserId> ids, Class<T> projection);
 
   <T> Optional<T> findById(UserId id, Class<T> projection);
+
+  <T> Optional<T> findByEmail(Email email, Class<T> clazz);
 }

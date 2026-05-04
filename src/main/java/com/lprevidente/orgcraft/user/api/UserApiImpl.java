@@ -1,8 +1,8 @@
 package com.lprevidente.orgcraft.user.api;
 
 import com.lprevidente.orgcraft.user.application.query.UserReadRepository;
+import com.lprevidente.orgcraft.user.domain.Email;
 import com.lprevidente.orgcraft.user.domain.Users;
-import com.lprevidente.orgcraft.user.api.UserId;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
@@ -15,6 +15,7 @@ import org.jmolecules.ddd.annotation.Service;
 @Service
 @RequiredArgsConstructor
 class UserApiImpl implements UserApi {
+
   private final Users users;
   private final UserReadRepository userReadRepository;
 
@@ -26,6 +27,11 @@ class UserApiImpl implements UserApi {
   @Override
   public <T> Optional<T> findById(UUID id, Class<T> clazz) {
     return userReadRepository.findById(new UserId(id), clazz);
+  }
+
+  @Override
+  public <T> Optional<T> findByEmail(String email, Class<T> clazz) {
+    return userReadRepository.findByEmail(new Email(email), clazz);
   }
 
   @Override

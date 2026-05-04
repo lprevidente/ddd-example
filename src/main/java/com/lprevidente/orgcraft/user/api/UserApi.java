@@ -13,5 +13,7 @@ public interface UserApi {
 
   <T> Optional<T> findById(UUID id, Class<T> clazz);
 
+  <T> Optional<T> findByEmail(String email, Class<T> clazz);
+
   <T extends UserIdDto> Map<UUID, T> findAllById(Collection<UUID> ids, Class<T> clazz);
 }

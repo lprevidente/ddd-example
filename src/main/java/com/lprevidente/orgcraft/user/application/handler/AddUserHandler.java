@@ -1,6 +1,7 @@
 package com.lprevidente.orgcraft.user.application.handler;
 
-import com.lprevidente.orgcraft.user.application.command.AddUser;
+import com.lprevidente.orgcraft.user.application.command.CreateUserReq;
+import com.lprevidente.orgcraft.user.application.command.CreateUserRes;
 import com.lprevidente.orgcraft.user.domain.*;
 import lombok.RequiredArgsConstructor;
 import org.jmolecules.architecture.cqrs.CommandHandler;
@@ -14,7 +15,7 @@ public class AddUserHandler {
   private final Users users;
 
   @CommandHandler
-  public UserId handle(AddUser command) {
+  public CreateUserRes handle(CreateUserReq command) {
     final var user =
         new User(
             command.firstName(),
@@ -23,6 +24,6 @@ public class AddUserHandler {
             new Email(command.email()),
             users);
     users.save(user);
-    return user.getId();
+    return new CreateUserRes(user.getId());
   }
 }
